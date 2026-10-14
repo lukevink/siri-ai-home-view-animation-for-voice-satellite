@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.12
+
+- Recoil the bulge into a shallow shoulder by the 35% entrance frame and reveal the glass during separation.
+
 ## 0.2.11
 
 - Round the connected liquid shoulder to remove the pinched neck and angular transition into the droplet.
