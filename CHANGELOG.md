@@ -4,7 +4,7 @@
 
 - Renamed to Siri AI Home View Animation for Voice Satellite.
 - Liquid top-bezel entrance with a stretching neck, pinch-off and settling motion.
-- Optional circular orb alongside the existing rounded island.
+- Circular orb by default; the existing rounded island remains available with `--siri-island-shape: island`.
 - Transparent lower glass, white bottom caustic and delicate rim; configurable opacity and glow.
 - Live dashboard refraction through a small inline SVG displacement filter where supported; transparent fallback elsewhere.
 - Fluid dots during thinking, with a smooth transition back to reactive listening/speaking waves.

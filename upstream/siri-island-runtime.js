@@ -708,7 +708,7 @@ var Island = class {
       return Number.isFinite(value) ? Math.max(0, Math.min(value, max)) : fallback;
     };
     this.appearance = {
-      circle: style.getPropertyValue("--siri-island-shape").trim() === "circle",
+      circle: style.getPropertyValue("--siri-island-shape").trim() !== "island",
       opacity: number("--siri-island-glass-opacity", 0.14),
       bottomGlow: number("--siri-island-bottom-glow", 0.8, 2),
       entrance: style.getPropertyValue("--siri-island-entrance").trim() !== "none"

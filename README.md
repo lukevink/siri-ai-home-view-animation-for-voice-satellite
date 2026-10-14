@@ -91,7 +91,7 @@ The `--siri-island-*` CSS names and `siri-island.js` filename remain compatible 
 
 | Setting | Default | Effect |
 | --- | --- | --- |
-| `--siri-island-shape` | `island` | `circle` selects the spherical orb; `island` retains the rounded shape. |
+| `--siri-island-shape` | `circle` | `circle` selects the spherical orb; `island` retains the rounded shape. |
 | `--siri-island-width` | `240px` | Width of the animation canvas; the visible orb occupies approximately 60% of it. |
 | `--siri-island-top` | `20px` | Gap below the safe-area inset after the drop settles. The entrance always starts at the viewport top. |
 | `--siri-island-glass-opacity` | `0.14` | Lower glass opacity from `0` to `1`; the upper cap stays dark. |
@@ -104,7 +104,7 @@ The lower glass is genuinely transparent to the dashboard. A separate SVG backdr
 
 ### Updating from Siri Island 0.1
 
-The repository was renamed from `lukevink/siriAI-voicesatellite`. GitHub redirects the old repository URL. Existing HACS installations may retain `/hacsfiles/siriAI-voicesatellite/siri-island.js`; keep the resource path actually provided by HACS rather than changing it blindly. New installations use the new repository name shown above. Reload the dashboard after updating, and add `--siri-island-shape: circle` to each browser's Custom CSS to select the new orb. The old shape remains the default for existing configurations.
+The repository was renamed from `lukevink/siriAI-voicesatellite`. GitHub redirects the old repository URL. Existing HACS installations may retain `/hacsfiles/siriAI-voicesatellite/siri-island.js`; keep the resource path actually provided by HACS rather than changing it blindly. New installations use the new repository name shown above. Reload the dashboard after updating, to get the new circular orb. Set `--siri-island-shape: island` in a browser's Custom CSS to retain the old rounded shape.
 
 When TTS is played on a remote speaker, Voice Satellite does not expose that speaker's audio levels to this browser. The skin still animates, but its movement is procedural rather than synchronized with remote audio. A wake chime or delay can also use an upstream synthetic level; the extension displays the signal it receives.
 
