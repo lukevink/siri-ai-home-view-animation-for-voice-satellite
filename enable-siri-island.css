@@ -6,6 +6,6 @@
   --siri-island-bottom-glow: 0.8;
   --siri-island-entrance: drop; /* drop or none */
   --siri-island-width: 240px;
-  --siri-island-top: 20px;
+  --siri-island-top: calc(var(--siri-island-width, 240px) * 0.096);
   --siri-island-backdrop-blur: 2px;
 }

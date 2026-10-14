@@ -136,7 +136,7 @@ export class IslandRenderer {
   render(delta, { state, level, reducedMotion = false, circle = false, opacity = 0.14, bottomGlow = 0.8, entrance = true, bulgeWidth = 1, bulgeStretch = 1, elapsed = delta }) {
     const active = state !== 'idle';
     const liquidMotion = !reducedMotion && entrance;
-    this.drop = Math.max(0, Math.min(1, this.drop + (active ? 1 : -1) * elapsed / (active ? 0.65 : 0.8)));
+    this.drop = Math.max(0, Math.min(1, this.drop + (active ? 1 : -1) * elapsed / (active ? 0.45 : 0.8)));
     // Keep the orb full-sized while it rises. Collapse only after it has
     // merged into the bezel, rather than shrinking to a pill in mid-air.
     this.spring.target = active || (liquidMotion && this.drop > 0) ? 1 : 0;

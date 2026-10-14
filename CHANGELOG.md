@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.2.7
+
+- Complete the coordinated drop entrance in 450 ms.
+
+- Hide status labels unless the UI has the `siri-island-show-status` class.
+
+- Scale the bulge, neck, and default resting gap with the orb diameter.
+
+- Start the orb as a narrow tapered droplet, widening around neck separation.
+- Coordinate the droplet tip, neck pinch-off, and immediate bezel retraction.
+
 ## 0.2.6
 
 - Increase thinking-dot rotation speed.
