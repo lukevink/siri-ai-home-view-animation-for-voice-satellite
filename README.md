@@ -4,6 +4,8 @@ A liquid drop from the top bezel that settles into a transparent glass orb or ro
 
 **The original animation is by [Neel Dedkawala](https://github.com/neeldedkawala).** This project adapts the shader and spring animation from his MIT-licensed **[iOS Siri Animation](https://github.com/neeldedkawala/ios-siri-animation)**. Please visit and credit the original project. The Home Assistant bridge, packaging, and audio-reactive adaptation are additions here.
 
+![Home View orb with transparent glass over the demo dashboard](docs/home-view-preview.png)
+
 Version 0.2 adds a liquid bezel entrance, a circular orb option, transparent glass with a white lower glow, and fluid thinking dots. Run the local preview below to compare both shapes and light/dark backgrounds.
 
 **Status: experimental 0.2.0.** The existing adapter has been used with Home Assistant and Android Kiosk Satellite. The new visuals are validated in the local preview and browser compatibility checks; physical-device performance of this version still needs verification. This is an independent community extension, not an official Voice Satellite or Apple product.
