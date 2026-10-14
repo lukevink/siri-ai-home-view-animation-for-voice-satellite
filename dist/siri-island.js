@@ -326,8 +326,8 @@ var x=`/* Scoped to the opt-in host: other Voice Satellite skins stay untouched.
                 // retract after pinch-off. Reversing u_drop rejoins that pool.
                 float lipWidth = max(0.01, 69.0 * birth * pinch);
                 float lipDepth = max(0.01, 15.0 * birth * pinch);
-                float dLip = (length(vec2((uv.x - 72.0) / lipWidth,
-                    (uv.y + 2.0) / lipDepth)) - 1.0) * lipDepth;
+                float shoulder = max(0.0, 1.0 - pow((uv.x - 72.0) / lipWidth, 2.0));
+                float dLip = uv.y - lipDepth * shoulder * shoulder;
                 dNeck = min(dNeck, dLip);
                 float join = 10.0 * pinch;
                 float blend = max(join - abs(dOrb - dNeck), 0.0) / max(join, 0.001);
@@ -477,8 +477,9 @@ var x=`/* Scoped to the opt-in host: other Voice Satellite skins stay untouched.
                 float alpha = max(bodyAlpha, lightAlpha);
                 // The neck is pure black; illumination belongs to the detached glass.
                 float orbMask = 1.0 - smoothstep(-1.0, 1.0, dOrb);
-                vec3 color = clamp((glassBody + lights) / max(alpha, 0.001), 0.0, 1.0) * orbMask;
-                alpha = mix(1.0, alpha, orbMask);
+                float glassReveal = smoothstep(0.28, 0.8, u_drop);
+                vec3 color = clamp((glassBody + lights) / max(alpha, 0.001), 0.0, 1.0) * orbMask * glassReveal;
+                alpha = mix(1.0, alpha, orbMask * glassReveal);
                 gl_FragColor = vec4(color, edgeIsland * alpha);
             }
         `;function w(n){return n?.classList.contains("visible")?n.classList.contains("error-mode")?"error":n.classList.contains("processing")?"processing":n.classList.contains("speaking")?"speaking":n.classList.contains("listening")?"listening":"connecting":"idle"}function y(n,e){if(!["listening","speaking"].includes(e)||!n?.classList.contains("reactive"))return 0;let i=Number.parseFloat(n.style.getPropertyValue("--vs-audio-level"));return Number.isFinite(i)?Math.max(0,Math.min(i,1)):0}var f=class{value=0;velocity=0;target=0;update(e){let i=Math.min(Math.max(e,0),.033)/4;for(let t=0;t<4;t++)this.velocity+=(-450*(this.value-this.target)-28*this.velocity)*i,this.value+=this.velocity*i;return Math.abs(this.velocity)<1e-4&&Math.abs(this.value-this.target)<1e-4&&(this.value=this.target,this.velocity=0),this.value}};var S=`
