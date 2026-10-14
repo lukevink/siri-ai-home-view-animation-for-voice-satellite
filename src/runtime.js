@@ -1,5 +1,6 @@
 import css from './island.css';
 import { IslandRenderer } from './renderer.js';
+import { GlassRefraction } from './refraction.js';
 import { readActivity, audioLevel } from './state.js';
 
 const KEY = Symbol.for('voice-satellite.siri-island');
@@ -17,6 +18,7 @@ class Island {
     this.el.className = 'siri-island';
     this.el.dataset.visible = 'false';
     this.el.innerHTML = '<canvas aria-hidden="true"></canvas><div class="siri-island-fallback" aria-hidden="true"><i></i><i></i><i></i><i></i></div><span class="siri-island-label" role="status" aria-live="polite"></span>';
+    this.glass = new GlassRefraction(this.el);
     this.canvas = this.el.querySelector('canvas');
     this.label = this.el.querySelector('.siri-island-label');
     ui.append(this.el);
@@ -50,9 +52,23 @@ class Island {
     this.failed = true;
     this.stop();
     this.el.dataset.renderer = 'fallback';
+    this.glass.update(0, false);
   }
 
   sync() {
+    const style = getComputedStyle(this.ui);
+    const number = (name, fallback, max = 1) => {
+      const value = parseFloat(style.getPropertyValue(name));
+      return Number.isFinite(value) ? Math.max(0, Math.min(value, max)) : fallback;
+    };
+    this.appearance = {
+      circle: style.getPropertyValue('--siri-island-shape').trim() !== 'island',
+      opacity: number('--siri-island-glass-opacity', 0.14),
+      bottomGlow: number('--siri-island-bottom-glow', 0.8, 2),
+      entrance: style.getPropertyValue('--siri-island-entrance').trim() !== 'none',
+    };
+    this.refraction = number('--siri-island-refraction', 18, 40);
+    this.el.dataset.shape = this.appearance.circle ? 'circle' : 'island';
     const next = readActivity(this.bar);
     const wasIdle = this.state === 'idle';
     this.state = next;
@@ -61,6 +77,7 @@ class Island {
     if (document.hidden) {
       this.stop();
       this.el.dataset.visible = 'false';
+      this.glass.update(0, false);
       return;
     }
     if (next !== 'idle') {
@@ -90,11 +107,14 @@ class Island {
       this.raf = requestAnimationFrame(next => this.tick(next));
       return;
     }
-    const delta = this.lastTime ? Math.min((time - this.lastTime) / 1000, .05) : 1 / 30;
+    const elapsed = this.lastTime ? (time - this.lastTime) / 1000 : 1 / 30;
+    const delta = Math.min(elapsed, .05);
     this.lastDraw = this.lastTime = time;
     const running = this.renderer.render(delta, {
-      state: this.state, level: audioLevel(this.bar, this.state), reducedMotion: this.motion.matches,
+      ...this.appearance, elapsed, state: this.state, level: audioLevel(this.bar, this.state), reducedMotion: this.motion.matches,
     });
+    this.glass.update(this.refraction, this.state !== 'idle' &&
+      (this.motion.matches || !this.appearance.entrance || this.renderer.drop >= 1));
     if (!running) this.el.dataset.visible = 'false';
     else if (!this.motion.matches) this.raf = requestAnimationFrame(next => this.tick(next));
   }
@@ -134,6 +154,7 @@ export function installSiriIsland() {
       island = null;
     }
     if (enabled && bar && !island) island = new Island(ui, bar);
+    else island?.sync();
   };
   const schedule = () => {
     if (queued) return;
@@ -147,7 +168,7 @@ export function installSiriIsland() {
   const headObserver = new MutationObserver(schedule);
   headObserver.observe(document.head, { childList: true, subtree: true, characterData: true });
   const api = {
-    version: '0.1.0',
+    version: '0.2.0',
     refresh: sync,
     dispose() {
       disposed = true;

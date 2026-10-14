@@ -8,6 +8,12 @@ export const fragmentShader = `
 
             uniform float u_time;
             uniform float u_progress;
+            uniform float u_drop;
+            uniform float u_circle;
+            uniform float u_thinking;
+            uniform float u_bodyOpacity;
+            uniform float u_top;
+            uniform float u_bottomGlow;
             uniform float u_waveFade;
             uniform float u_waveIntro;
             uniform float u_introStartAmp;
@@ -100,7 +106,8 @@ export const fragmentShader = `
                 float botArch = u_shapeParams.w;
                 float d2 = sdBulbousSquircle(p, expDim, topArch, botArch);
 
-                return mix(d1, d2, prog);
+                float circle = length(p) - 43.0;
+                return mix(d1, mix(d2, circle, u_circle), prog);
             }
 
             vec2 calcNormal2D(vec2 p, float prog) {
@@ -143,16 +150,61 @@ export const fragmentShader = `
                 return vec3(texture2D(tex, fUvR).r, texture2D(tex, fUvG).g, texture2D(tex, fUvB).b);
             }
 
+            float smoothUnion(float a, float b, float k) {
+                float h = max(k - abs(a - b), 0.0) / k;
+                return min(a, b) - h * h * k * 0.25;
+            }
+
+            // Original implementation; visual inspiration: 40973894's Siri Wave / Fluid Dots.
+            vec3 fluidDots(vec2 p, float time) {
+                float t = -time * 0.65;
+                float gather = 0.5 + 0.5 * sin(t * 0.85);
+                float distanceField = 10.0;
+                vec3 tint = vec3(0.0);
+                float weight = 0.0;
+                for (int i = 0; i < 5; i++) {
+                    float f = float(i);
+                    float angle = f * 1.256637 + t * 0.45;
+                    float radius = mix(0.12, 0.40, gather) + 0.035 * sin(t * 1.7 + f);
+                    vec2 center = vec2(cos(angle), sin(angle)) * radius;
+                    center.y *= 0.72;
+                    float size = 0.105 + 0.025 * sin(t * 1.3 + f * 2.0);
+                    float d = length(p - center) - size;
+                    distanceField = smoothUnion(distanceField, d, 0.18);
+                    float w = exp(-length(p - center) * 9.0);
+                    vec3 c = 0.55 + 0.45 * cos(vec3(0.0, 2.1, 4.2) + f * 1.25 + t * 0.25);
+                    tint += c * w;
+                    weight += w;
+                }
+                tint /= max(weight, 0.001);
+                float core = 1.0 - smoothstep(-0.025, 0.018, distanceField);
+                float glow = exp(-max(distanceField, 0.0) * 20.0) * 0.22;
+                float edge = exp(-abs(distanceField) * 65.0);
+                return mix(tint, vec3(1.0), 0.65) * core + tint * glow + vec3(0.3) * edge;
+            }
+
             void main() {
                 vec2 uv = vec2(vUv.x, 1.0 - vUv.y) * u_resolution;
-                float cx = 72.0;
-                float cy = 20.0;
-                vec2 p = uv - vec2(cx, cy);
-
-                float yShiftDown = mix(0.0, (u_shapeParams.y - 11.5) - u_topMorphUp, u_progress);
-                p.y -= yShiftDown;
-
-                float dIsland = getIslandSDF(p, u_progress);
+                float currentH = mix(41.0, 43.0, u_circle);
+                // Extrude, pinch off, then settle: one continuous surface at the bezel.
+                float travel = smoothstep(0.0, 0.78, u_drop);
+                float settle = sin((u_drop - 0.78) * 18.0) *
+                    (1.0 - smoothstep(0.78, 1.0, u_drop)) * 3.0 * step(0.78, u_drop);
+                float centerY = mix(-14.0, u_top + currentH + 5.0, travel) + settle;
+                float grow = mix(0.32, 1.0, smoothstep(0.08, 0.85, u_drop));
+                vec2 p = uv - vec2(72.0, centerY);
+                p /= grow;
+                p.y /= 1.0 + 0.22 * sin(u_drop * PI);
+                float dOrb = getIslandSDF(p, u_progress) * grow;
+                float neckEnd = max(centerY, 1.0);
+                float along = clamp(uv.y / neckEnd, 0.0, 1.0);
+                float pinch = 1.0 - smoothstep(0.32, 0.62, u_drop);
+                float neckWidth = (3.0 + 30.0 * pow(1.0 - along, 3.0)) * pinch;
+                float dNeck = max(abs(uv.x - 72.0) - neckWidth, uv.y - neckEnd);
+                float join = 10.0 * pinch;
+                float blend = max(join - abs(dOrb - dNeck), 0.0) / max(join, 0.001);
+                float joined = min(dOrb, dNeck) - blend * blend * join * 0.25;
+                float dIsland = u_drop < 0.62 ? joined : dOrb;
 
                 float afwidth = length(vec2(dFdx(dIsland), dFdy(dIsland))) * 0.7071;
                 float edgeIsland = (1.0 - smoothstep(-afwidth, afwidth, dIsland));
@@ -184,11 +236,11 @@ export const fragmentShader = `
                 vec3 transmission = exp(-opticalDepth * (vec3(1.0) - u_glassTint));
                 refractedBg *= transmission;
 
-                float currentH = mix(11.5, u_shapeParams.y, u_progress);
+                currentH = mix(11.5, currentH, u_progress);
                 float yRatio = clamp((p.y + currentH * 0.15) / (currentH * 1.15), 0.0, 1.0);
                 float glassTranslucency = smoothstep(0.18, 0.92, yRatio) * u_progress;
 
-                vec3 glassBody = mix(vec3(0.0), refractedBg * u_showBackground, glassTranslucency);
+                vec3 glassBody = refractedBg * 0.025 * glassTranslucency;
 
                 // Volumetric Spindle Wave
                 vec3 accumulatedWave = vec3(0.0);
@@ -283,12 +335,22 @@ export const fragmentShader = `
                     accumulatedWave = waveAccum * glowIntensity * u_waveFade;
                 }
 
-                // Apple Physical Glass Bottom Edge White Meniscus Sheen
-                float bottomFactor = clamp((p.y + currentH * 0.25) / (currentH * 1.25), 0.0, 1.0);
-                float rimGlow = (1.0 - smoothstep(0.0, max(u_bottomRimWidth, 0.1), distFromBorder)) * bottomFactor * u_progress;
-                vec3 bottomRimHighlight = vec3(0.96, 0.98, 1.0) * (rimGlow * u_bottomRimIntensity);
-
-                vec3 finalRGB = glassBody + accumulatedWave + bottomRimHighlight;
-                gl_FragColor = vec4(clamp(finalRGB, 0.0, 1.0), edgeIsland);
+                // A transmissive lower hemisphere, a dark upper cap and white caustic.
+                float lower = smoothstep(-0.3, 0.65, p.y / max(currentH, 1.0));
+                float bodyAlpha = mix(0.96, u_bodyOpacity, lower);
+                float rim = exp(-distFromBorder * 1.7) * (0.18 + 0.82 * lower);
+                float bottomLight = exp(-pow(p.x / 20.0, 2.0) - pow((p.y - currentH * 0.83) / 9.0, 2.0));
+                float horizon = exp(-pow((p.y - 4.0 + 3.0 * cos(p.x / 28.0)) / 1.9, 2.0)) *
+                    exp(-pow(p.x / 37.0, 4.0));
+                float sheen = (rim * 0.75 + bottomLight * u_bottomGlow + horizon * 0.18) * u_progress;
+                vec3 lights = accumulatedWave * (1.0 - u_thinking) + fluidDots(p / 43.0, u_time) * u_thinking * u_waveFade;
+                lights += vec3(1.0, 0.97, 0.93) * sheen;
+                float lightAlpha = clamp(max(max(lights.r, lights.g), lights.b), 0.0, 1.0);
+                float alpha = max(bodyAlpha, lightAlpha);
+                // The neck is pure black; illumination belongs to the detached glass.
+                float orbMask = 1.0 - smoothstep(-1.0, 1.0, dOrb);
+                vec3 color = clamp((glassBody + lights) / max(alpha, 0.001), 0.0, 1.0) * orbMask;
+                alpha = mix(1.0, alpha, orbMask);
+                gl_FragColor = vec4(color, edgeIsland * alpha);
             }
         `;

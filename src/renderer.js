@@ -33,6 +33,8 @@ export class IslandRenderer {
     this.fade = 0;
     this.intro = 0;
     this.level = 0;
+    this.drop = 0;
+    this.thinking = 0;
     this.locations = new Map();
     this.shaders = [];
     const gl = canvas.getContext('webgl', {
@@ -117,18 +119,30 @@ export class IslandRenderer {
   resize() {
     const ratio = Math.min(window.devicePixelRatio || 1, 2);
     const width = this.canvas.clientWidth || 240;
+    const height = this.canvas.clientHeight || width * 112 / 144;
     this.canvas.width = Math.round(width * ratio);
-    this.canvas.height = Math.round(width * 112 / 144 * ratio);
+    this.canvas.height = Math.round(height * ratio);
     this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
+    this.gl.uniform2f(this.location('u_resolution'), 144, height / width * 144);
+    this.float('u_top', Math.max(0, height / width * 144 - 112));
   }
 
   reset() {
-    this.spring.value = this.spring.velocity = this.fade = this.intro = this.time = this.level = 0;
+    this.spring.value = this.spring.velocity = this.fade = this.intro = this.time = this.level = this.drop = this.thinking = 0;
+    this.drop = 0;
+    this.thinking = 0;
   }
 
-  render(delta, { state, level, reducedMotion = false }) {
+  render(delta, { state, level, reducedMotion = false, circle = false, opacity = 0.14, bottomGlow = 0.8, entrance = true, elapsed = delta }) {
     const active = state !== 'idle';
     this.spring.target = active ? 1 : 0;
+    this.drop = Math.min(1, this.drop + elapsed / 0.95);
+    this.thinking += (Number(state === 'processing') - this.thinking) * (1 - Math.exp(-delta * 8));
+    this.float('u_drop', reducedMotion || !entrance ? 1 : this.drop);
+    this.float('u_circle', Number(circle));
+    this.float('u_bodyOpacity', opacity);
+    this.float('u_bottomGlow', bottomGlow);
+    this.float('u_thinking', reducedMotion ? Number(state === 'processing') : this.thinking);
     const progress = reducedMotion ? Number(active) : this.spring.update(delta);
     this.level += (level - this.level) * (1 - Math.exp(-delta * (level > this.level ? 18 : 7)));
     if (active && progress > 0.98) {

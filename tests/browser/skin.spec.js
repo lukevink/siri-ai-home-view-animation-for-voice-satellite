@@ -93,3 +93,20 @@ test('backgrounding hides the island; returning restores the current phase', asy
   await expect(page.locator('.siri-island')).toHaveAttribute('data-visible','true');
   await expect(page.locator('.siri-island')).toHaveAttribute('data-state','speaking');
 });
+
+
+test('circle, live glass settings and legacy island switch without duplicate renderers', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Think', exact: true }).click();
+  const island = page.locator('.siri-island');
+  await expect(island).toHaveAttribute('data-shape', 'circle');
+  await expect(island).toHaveAttribute('data-renderer', 'webgl');
+  await expect(page.locator('.siri-island-refraction')).toBeVisible();
+  await page.locator('#shape').selectOption('island');
+  await expect(island).toHaveAttribute('data-shape', 'island');
+  await expect(page.locator('.siri-island canvas')).toHaveCount(1);
+  await page.locator('#enabled').uncheck();
+  await expect(page.locator('.siri-island-refraction')).toHaveCount(0);
+  await page.locator('#enabled').check();
+  await expect(page.locator('.siri-island-refraction')).toHaveCount(1);
+});

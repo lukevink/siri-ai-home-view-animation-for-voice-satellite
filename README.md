@@ -1,14 +1,14 @@
-# Siri Island for Voice Satellite
+# Siri AI Home View Animation for Voice Satellite
 
-A floating glass island with flowing, audio-reactive Siri-style waves for [Voice Satellite for Home Assistant](https://github.com/jxlarrea/voice-satellite-card-integration). It opens when Voice Satellite starts a voice interaction, changes with listening / thinking / speaking, and disappears when the interaction ends.
+A liquid drop from the top bezel that settles into a transparent glass orb or rounded island, with audio-reactive Siri-style waves for [Voice Satellite for Home Assistant](https://github.com/jxlarrea/voice-satellite-card-integration). It opens when Voice Satellite starts a voice interaction, changes with listening / thinking / speaking, and disappears when the interaction ends.
 
 **The original animation is by [Neel Dedkawala](https://github.com/neeldedkawala).** This project adapts the shader and spring animation from his MIT-licensed **[iOS Siri Animation](https://github.com/neeldedkawala/ios-siri-animation)**. Please visit and credit the original project. The Home Assistant bridge, packaging, and audio-reactive adaptation are additions here.
 
-![Siri Island animation preview with simulated audio](docs/island.gif)
+![Home View orb with transparent glass over the demo dashboard](docs/home-view-preview.png)
 
-[Full dashboard screenshot](docs/preview.png) · [Recorded preview](docs/preview.webm)
+Version 0.2 adds a liquid bezel entrance, a circular orb option, transparent glass with a white lower glow, and fluid thinking dots. Run the local preview below to compare both shapes and light/dark backgrounds.
 
-**Status: experimental 0.1.0.** Browser-tested in Chromium and WebKit with Voice Satellite's actual skin CSS and simulated activity/audio signals. Not yet tested against a running Home Assistant instance or physical Android/iPhone hardware. This is an independent community extension, not an official Voice Satellite or Apple product.
+**Status: experimental 0.2.0.** The existing adapter has been used with Home Assistant and Android Kiosk Satellite. The new visuals are validated in the local preview and browser compatibility checks; physical-device performance of this version still needs verification. This is an independent community extension, not an official Voice Satellite or Apple product.
 
 ## What you install
 
@@ -16,7 +16,9 @@ This is a **companion JavaScript frontend resource**, enabled through Voice Sate
 
 It uses the same activity-bar classes and `--vs-audio-level` value that Voice Satellite's bundled animated skins use. It does not open a microphone, run wake-word detection, connect to Home Assistant, or replace the Assist pipeline. Voice Satellite remains responsible for all of those functions.
 
-- Morphs from a compact pill into the reference animation's rounded glass island.
+- Flows from the top edge, stretches into a liquid neck, detaches, and settles into a circle or rounded island.
+- Uses real canvas transparency in the lower hemisphere, a dark upper cap, a thin rim and a white bottom glow.
+- Merges and scatters five luminous fluid dots while thinking, then crossfades back to audio-reactive waves.
 - Reacts to local microphone and local speech playback levels when **Reactive activity bar** is enabled.
 - Uses gentler procedural motion while thinking, or when real audio levels are unavailable.
 - Stays attached to Voice Satellite's global UI across dashboard navigation.
@@ -35,12 +37,12 @@ The adapter was developed against Voice Satellite commit [`78f0f4b`](https://git
 This repository is designed for **HACS custom repository installation**, not yet included in the default HACS catalog.
 
 1. Open **HACS → ⋮ → Custom repositories**.
-2. Add `https://github.com/lukevink/siriAI-voicesatellite` with category **Dashboard**.
-3. Download **Voice Satellite — Siri Island**.
+2. Add `https://github.com/lukevink/siri-ai-home-view-animation-for-voice-satellite` with category **Dashboard**.
+3. Download **Siri AI Home View Animation for Voice Satellite**.
 4. Check **Settings → Dashboards → Resources** for a JavaScript module resource pointing to:
 
    ```text
-   /hacsfiles/siriAI-voicesatellite/siri-island.js
+   /hacsfiles/siri-ai-home-view-animation-for-voice-satellite/siri-island.js
    ```
 
    HACS may add this automatically. Add it only if it is missing. Advanced mode may be needed to see Resources.
@@ -54,6 +56,9 @@ This repository is designed for **HACS custom repository installation**, not yet
    ```css
    #voice-satellite-ui {
      --siri-island-enabled: 1;
+     --siri-island-shape: circle;
+     --siri-island-glass-opacity: 0.14;
+     --siri-island-bottom-glow: 0.8;
      --siri-island-width: 240px;
      --siri-island-top: 20px;
      --siri-island-backdrop-blur: 2px;
@@ -67,7 +72,7 @@ Dashboard resources load with dashboards. For loading from **every Home Assistan
 ```yaml
 frontend:
   extra_module_url:
-    - /hacsfiles/siriAI-voicesatellite/siri-island.js
+    - /hacsfiles/siri-ai-home-view-animation-for-voice-satellite/siri-island.js
 ```
 
 Merge this into an existing `frontend:` section rather than creating a duplicate key. Restart Home Assistant after changing YAML. The module is a singleton, so loading it through both routes does not create duplicate islands. See [Home Assistant's extra module documentation](https://www.home-assistant.io/integrations/frontend/#loading-extra-javascript).
@@ -75,16 +80,31 @@ Merge this into an existing `frontend:` section rather than creating a duplicate
 ## Manual installation
 
 1. Copy [`dist/siri-island.js`](dist/siri-island.js) to `/config/www/siri-island.js` on your Home Assistant server.
-2. Add `/local/siri-island.js?v=0.1.0` as a JavaScript module under Dashboard Resources, or use that URL under `frontend.extra_module_url` above.
+2. Add `/local/siri-island.js?v=0.2.0` as a JavaScript module under Dashboard Resources, or use that URL under `frontend.extra_module_url` above.
 3. Follow steps 5–7 from the HACS instructions.
 
 No Python component, card YAML, or access token is required. Keep the copyright/license banner in the distributed JavaScript file intact.
 
 ## Adjusting the appearance
 
-Change `--siri-island-width` to resize the whole animation. `--siri-island-top` is the distance below the device's safe-area inset, so it accounts for notches. The default position is top center. The shader stays dark on light or dark dashboards, like the reference.
+The `--siri-island-*` CSS names and `siri-island.js` filename remain compatible with earlier installations.
 
-The shader refracts a small generated studio-light texture. It **does not refract the live dashboard HTML**. The original demo refracts its own wallpaper texture, which cannot simply be replaced by a live web page. The island geometry, multicolor waves, and spring motion come from the original effect; the environment texture, cropping, audio modulation, and lifecycle are adapted.
+| Setting | Default | Effect |
+| --- | --- | --- |
+| `--siri-island-shape` | `circle` | `circle` selects the spherical orb; `island` retains the rounded shape. |
+| `--siri-island-width` | `240px` | Width of the animation canvas; the visible orb occupies approximately 60% of it. |
+| `--siri-island-top` | `20px` | Gap below the safe-area inset after the drop settles. The entrance always starts at the viewport top. |
+| `--siri-island-glass-opacity` | `0.14` | Lower glass opacity from `0` to `1`; the upper cap stays dark. |
+| `--siri-island-bottom-glow` | `0.8` | White lower glow strength from `0` to `2`. |
+| `--siri-island-refraction` | `18` | Live backdrop displacement strength from `0` to `40` pixels; `0` disables it. |
+| `--siri-island-entrance` | `drop` | Set `none` to disable the falling entrance. Reduced-motion users also skip it. |
+| `--siri-island-backdrop-blur` | `2px` | Blur applied to Voice Satellite's full-screen backdrop. |
+
+The lower glass is genuinely transparent to the dashboard. A separate SVG backdrop displacement layer bends the actual dashboard behind the settled orb in browsers that support SVG backdrop filters (verified in Chromium). The WebGL shader adds the illuminated rim and subtle studio reflections. Safari and other browsers without SVG backdrop-filter support retain the transparent glass without live distortion. This is a browser approximation, not Apple’s system compositor. No DOM screenshot capture or additional network requests are involved. Fluid dots are an original lightweight smooth-union shader inspired by [40973894's Siri Wave / Fluid Dots](https://21st.dev/@40973894/components/siri-wave/fluid-dots); no React dependency or code from that component is bundled.
+
+### Updating from Siri Island 0.1
+
+The repository was renamed from `lukevink/siriAI-voicesatellite`. GitHub redirects the old repository URL. Existing HACS installations may retain `/hacsfiles/siriAI-voicesatellite/siri-island.js`; keep the resource path actually provided by HACS rather than changing it blindly. New installations use the new repository name shown above. Reload the dashboard after updating, to get the new circular orb. Set `--siri-island-shape: island` in a browser's Custom CSS to retain the old rounded shape.
 
 When TTS is played on a remote speaker, Voice Satellite does not expose that speaker's audio levels to this browser. The skin still animates, but its movement is procedural rather than synchronized with remote audio. A wake chime or delay can also use an upstream synthetic level; the extension displays the signal it receives.
 
@@ -118,6 +138,7 @@ The browser tests exercise WebGL shader compilation, state changes, teardown/re-
 ## Credits and licenses
 
 - **Original animation, shader, and spring model:** [Neel Dedkawala — ios-siri-animation](https://github.com/neeldedkawala/ios-siri-animation), copyright © 2026 Neel Dedkawala, **MIT**. The original permission notice is preserved in [`licenses/ios-siri-animation.txt`](licenses/ios-siri-animation.txt), the built JavaScript, and the generated upstream runtime.
+- **Thinking-dots visual inspiration:** [40973894 — Siri Wave / Fluid Dots](https://21st.dev/@40973894/components/siri-wave/fluid-dots). Independently implemented here; no source code copied.
 - **Voice engine, overlay conventions, and test stylesheet:** [jxlarrea — Voice Satellite](https://github.com/jxlarrea/voice-satellite-card-integration), **AGPL-3.0**. This extension relies on that project's work and keeps its attribution.
 - **This repository:** **AGPL-3.0-only**, with the original shader retaining its MIT notice. See [`LICENSE`](LICENSE) and [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md).
 

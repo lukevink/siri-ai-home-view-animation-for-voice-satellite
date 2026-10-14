@@ -1,6 +1,10 @@
 /* Voice Satellite → Advanced → Custom CSS. Select the built-in Siri skin. */
 #voice-satellite-ui {
   --siri-island-enabled: 1;
+  --siri-island-shape: circle; /* circle or island */
+  --siri-island-glass-opacity: 0.14;
+  --siri-island-bottom-glow: 0.8;
+  --siri-island-entrance: drop; /* drop or none */
   --siri-island-width: 240px;
   --siri-island-top: 20px;
   --siri-island-backdrop-blur: 2px;
