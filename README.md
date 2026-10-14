@@ -4,7 +4,7 @@ A liquid drop from the top bezel that settles into a transparent glass orb or ro
 
 **The original animation is by [Neel Dedkawala](https://github.com/neeldedkawala).** This project adapts the shader and spring animation from his MIT-licensed **[iOS Siri Animation](https://github.com/neeldedkawala/ios-siri-animation)**. Please visit and credit the original project. The Home Assistant bridge, packaging, and audio-reactive adaptation are additions here.
 
-![Animated Home View orb: liquid bezel entrance, waves morphing into thinking dots, speech and bezel return](docs/home-view-preview.gif)
+<img src="docs/home-view-preview.gif" alt="Animated Home View orb: liquid bezel entrance, waves morphing into thinking dots, speech and bezel return" width="560">
 
 ## What you install
 
@@ -95,6 +95,8 @@ No Python component, card YAML, or access token is required. Keep the copyright/
 | `--siri-island-backdrop-blur` | `2px` | Blur applied to Voice Satellite's full-screen backdrop. |
 
 The lower half of the orb is transparent to the dashboard. A separate SVG backdrop displacement layer bends the actual dashboard behind the settled orb in browsers that support SVG backdrop filters. The WebGL shader adds the illuminated rim and subtle studio reflections. Safari and other browsers without SVG backdrop-filter support retain the transparent glass without live distortion. This is a browser approximation, not Apple’s system compositor. No DOM screenshot capture or additional network requests are involved. Fluid dots are an original lightweight smooth-union shader inspired by [40973894's Siri Wave / Fluid Dots](https://21st.dev/@40973894/components/siri-wave/fluid-dots); no React dependency or code from that component is bundled.
+
+![Circular orb and conversation captions over a dashboard](docs/dashboard-preview.gif)
 
 ## Updating
 
