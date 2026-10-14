@@ -11,23 +11,47 @@
     #voice-satellite-ui { --siri-island-enabled: 1; --siri-island-width: 260px; --siri-island-shape: circle; }
   </style>
 </head>
-<body>
+<body class="light-backdrop">
   <div class="glass-test-pattern" aria-hidden="true">HOME VIEW · LIQUID GLASS<br>0123456789 · REFRACTION</div>
   <div class="readme-caption"><h1>Siri Home View</h1><p>Liquid glass animation for Voice Satellite</p><small>SIMULATED VOICE · REAL RENDERER</small></div>
   <div class="shell">
-    <aside><a class="brand" href="#home"><span class="brand-mark">⌂</span> home</a><nav><a href="#home" class="selected">Overview</a><a href="#rooms">Rooms</a><a href="#energy">Energy</a></nav><div class="aside-foot"><span class="online"></span> All systems online</div></aside>
-    <main>
-      <header><span class="eyebrow">YOUR SPACE, CONNECTED</span><span class="date">Wednesday, October 14</span></header>
-      <div class="heading"><div><h1>Good evening.</h1><p>A little quieter. A little warmer. Welcome home.</p></div><div class="weather"><span>☀</span><strong>18°</strong><small>Clear skies</small></div></div>
-      <div class="status-row"><span><i class="online"></i> Home is secure</span><span>Indoor <b>21.5°</b></span><span>Lights on <b>4</b></span></div>
-      <section class="rooms" aria-label="Example dashboard">
-        <article class="room living"><div class="room-top"><span class="room-icon">◒</span><span class="room-temp">21.5°</span></div><div><small>YOUR EVENING SPACE</small><h2>Living room</h2><p>Warm light · 65%</p></div><div class="room-bottom"><span>● &nbsp; 2 lights on</span><button aria-label="Toggle living room" class="toggle" aria-pressed="true"></button></div></article>
-        <article class="room kitchen"><div class="room-top"><span class="room-icon">◫</span><span class="room-temp">22.0°</span></div><div><small>READY WHEN YOU ARE</small><h2>Kitchen</h2><p>Pendant lights · 80%</p></div><div class="room-bottom"><span>● &nbsp; 2 lights on</span><button aria-label="Toggle kitchen" class="toggle" aria-pressed="true"></button></div></article>
-        <article class="room bedroom"><div class="room-top"><span class="room-icon">☾</span><span class="room-temp">19.0°</span></div><div><small>REST COMES NATURALLY</small><h2>Bedroom</h2><p>Lights off · Blinds closed</p></div><div class="room-bottom"><span>○ &nbsp; Everything off</span><button aria-label="Toggle bedroom" class="toggle off" aria-pressed="false"></button></div></article>
-      </section>
-      <div class="lower"><section class="scene-panel"><div class="section-title"><h2>Set the mood</h2><small>SCENES</small></div><div class="scenes"><button>◐ <span>Wind down</span></button><button>▷ <span>Movie night</span></button><button>☾ <span>Good night</span></button></div></section><section class="energy-panel"><small>TODAY'S ENERGY</small><strong>4.8 <span>kWh</span></strong><p>↓ 12% less than yesterday</p><div class="bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></section></div>
-      <footer>Example dashboard · controls do not operate real devices</footer>
-    </main>
+    <aside aria-label="Dashboard sidebar"><span>☰</span><span class="selected">▦</span><span>ϟ</span><span>▤</span><span>◷</span><span>⚙</span></aside>
+    <div class="dashboard">
+      <header><nav><a class="selected" href="#home">HOME</a><a href="#rooms">ROOMS</a><a href="#energy">ENERGY</a></nav><span aria-hidden="true">⌕ &nbsp; ◇</span></header>
+      <main aria-label="Example dashboard">
+        <section class="dashboard-section"><h2>Weather</h2>
+          <article class="card weather-card"><div class="current-weather"><span class="sun">☀</span><div><strong>Sunny</strong><small>Forecast · Home</small></div><strong>18.5°</strong></div>
+          <div class="forecast"><div>Mon<span>☀</span>19°<small>12°</small></div><div>Tue<span>☁</span>17°<small>11°</small></div><div>Wed<span>☀</span>21°<small>14°</small></div><div>Thu<span>☁</span>18°<small>12°</small></div><div>Fri<span>☂</span>16°<small>10°</small></div></div></article>
+          <article class="card forecast hourly"><div>7 PM<span>☀</span>18°</div><div>8 PM<span>☁</span>17°</div><div>9 PM<span>☁</span>16°</div><div>10 PM<span>☾</span>15°</div></article>
+        </section>
+        <section class="dashboard-section"><h2>Neighborhood</h2><article class="card map-card" aria-label="Illustrative neighborhood map">
+          <svg viewBox="0 0 360 340" role="img" aria-label="Example neighborhood with home marker"><defs><pattern id="streets" width="45" height="38" patternTransform="rotate(24)" patternUnits="userSpaceOnUse"><rect width="45" height="38" fill="#f1edde"/><path d="M0 0H45V38" fill="none" stroke="white" stroke-width="7"/></pattern></defs><rect width="360" height="340" fill="url(#streets)"/><path d="M105 -20Q215 100 115 200T100 370" fill="none" stroke="#cbe5eb" stroke-width="80"/><path d="M-20 240L380 70" stroke="#f8d88b" stroke-width="12"/><circle cx="236" cy="174" r="22" fill="white" stroke="#ffbd42" stroke-width="4"/><path d="M224 175L236 164L248 175V188H239V180H233V188H224Z" fill="#333"/><text x="20" y="320" font-size="10" fill="#6d8188">Illustrative map</text></svg>
+        </article></section>
+        <section class="dashboard-section"><h2>Kitchen</h2><div class="tile-grid">
+          <button class="card tile toggle off" aria-label="Toggle kitchen" aria-pressed="false"><i>☼</i><span>Counter lights<small>Off</small></span></button>
+          <article class="card tile"><i>◉</i><span>Accent lights<small>Off</small></span></article>
+          <article class="card sensor"><small>CO₂ sensor</small><strong>507 <small>ppm</small></strong><svg viewBox="0 0 200 45" aria-hidden="true"><path d="M0 40Q15 10 30 25T65 28T105 18T140 28T175 30T200 18" fill="none" stroke="#ffbc60" stroke-width="2"/></svg></article>
+          <article class="card tile"><i>♨</i><span>Temperature<small>21.5 °C</small></span></article>
+          <article class="card tile"><i>♧</i><span>Humidity<small>42%</small></span></article>
+          <article class="card tile"><i>≋</i><span>Air quality<small>Good</small></span></article>
+          <article class="card tile"><i>◌</i><span>PM2.5<small>1.4 µg/m³</small></span></article>
+        </div></section>
+        <section class="dashboard-section"><h2>Living room</h2><div class="tile-grid">
+          <button class="card tile tall toggle" aria-label="Toggle living room" aria-pressed="true"><i class="purple">☼</i><span>Main lights<small>58%</small></span></button>
+          <article class="card tile tall"><i class="pink">☼</i><span>Accent lights<small>38%</small></span></article>
+          <article class="card tile"><i>♧</i><span>Floor lamp<small>Off</small></span></article>
+          <article class="card tile"><i>♨</i><span>Temperature<small>21.0 °C</small></span></article>
+        </div></section>
+        <section class="dashboard-section"><h2>Bedroom</h2><div class="tile-grid">
+          <button class="card tile tall toggle off" aria-label="Toggle bedroom" aria-pressed="false"><i>☼</i><span>Bedroom lights<small>Off</small></span></button>
+          <article class="card tile tall"><i>♫</i><span>Bedroom speaker<small>Not playing</small></span></article>
+          <article class="card tile"><i>♨</i><span>Temperature<small>19.0 °C</small></span></article>
+          <article class="card tile"><i>▥</i><span>Blinds<small>Closed</small></span></article>
+        </div></section>
+        <section class="dashboard-section"><h2>Groceries</h2><article class="card groceries"><div class="add-item">Add item <span>+</span></div><strong>Shopping list</strong><label><input type="checkbox"> Coffee</label><label><input type="checkbox"> Oat milk</label><label><input type="checkbox"> Apples</label></article></section>
+        <footer>Example dashboard · controls do not operate real devices</footer>
+      </main>
+    </div>
   </div>
   <div id="voice-satellite-ui">
     <div class="vs-blur-overlay" style="background:rgba(5,7,14,.22)"></div>
@@ -37,7 +61,7 @@
   <section class="demo-controls" aria-label="Animation preview controls">
     <div class="control-title"><span>SIRI AI HOME VIEW <b>for Voice Satellite</b></span><span class="demo-badge">SIMULATED AUDIO</span></div>
     <div class="control-buttons"><button data-state="listening">Listen</button><button data-state="processing">Think</button><button data-state="speaking">Speak</button><button data-state="idle">Finish</button><button id="sequence">▶ Play sequence</button></div>
-    <div class="appearance-control"><label>Shape <select id="shape"><option value="circle">Circle orb</option><option value="island">Rounded island</option></select></label><label>Glass opacity <input id="opacity" type="range" min="0" max="0.8" step="0.01" value="0.14"></label><label><input id="light-backdrop" type="checkbox"> Light backdrop</label><label><input id="show-status" type="checkbox"> Show status label</label><button id="drop-preview">Replay drop</button></div>
+    <div class="appearance-control"><label>Shape <select id="shape"><option value="circle">Circle orb</option><option value="island">Rounded island</option></select></label><label>Glass opacity <input id="opacity" type="range" min="0" max="0.8" step="0.01" value="0.14"></label><label><input id="light-backdrop" type="checkbox" checked> Light backdrop</label><label><input id="show-status" type="checkbox"> Show status label</label><button id="drop-preview">Replay drop</button><a href="/demo/motion.html" target="_blank">Frame by frame</a></div>
     <div class="appearance-control"><label>Horizontal position <input id="left" type="range" min="15" max="85" step="1" value="50"><output id="left-output">50</output></label><label>Resting height <input id="top" type="range" min="0" max="180" step="1" value="25"><output id="top-output">25</output></label><label>Bulge width <input id="bulge-width" type="range" min="0" max="1.4" step="0.05" value="1"><output id="bulge-width-output">1</output></label><label>Bulge stretch <input id="bulge-stretch" type="range" min="0" max="2.5" step="0.05" value="1"><output id="bulge-stretch-output">1</output></label></div>
     <div class="audio-control"><label for="level">Voice level</label><input id="level" type="range" min="0" max="1" step="0.01" value="0.55"><output id="level-output">55%</output><label class="checkbox"><input type="checkbox" id="enabled" checked> Enable skin</label></div>
     <p>Animation adapted from <a href="https://github.com/neeldedkawala/ios-siri-animation" target="_blank" rel="noreferrer">Neel Dedkawala’s iOS Siri Animation</a> · MIT</p>
