@@ -633,40 +633,32 @@ var IslandRenderer = class {
   }
 };
 
+// src/lens.js
+function sphereDisplacement(radius) {
+  const r = Math.max(0, Math.min(1, radius));
+  if (r === 0 || r === 1) return 0;
+  const depth = Math.sqrt(Math.max(0, 1 - r * r));
+  const deflection = Math.asin(r) - Math.asin(r / 1.45);
+  const edge = Math.max(0, Math.min(1, (r - 0.3) / 0.5));
+  const shell = edge * edge * (3 - 2 * edge);
+  return -0.75 * shell * depth * Math.tan(deflection);
+}
+
 // src/refraction.js
+var MAP_RANGE = 0.17;
 var GlassRefraction = class {
   constructor(host) {
     this.host = host;
     const id = `siri-glass-${Math.random().toString(36).slice(2)}`;
-    const map = document.createElement("canvas");
-    const size = 256;
-    map.width = map.height = size;
-    const context = map.getContext("2d");
-    if (!context) return;
-    const pixels = context.createImageData(size, size);
-    for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) {
-      const nx = (x + 0.5) / (size / 2) - 1, ny = (y + 0.5) / (size / 2) - 1;
-      const r = Math.hypot(nx, ny);
-      const edge = Math.max(0, Math.min(1, (r - 0.3) / 0.7));
-      const curvature = edge * edge * (3 - 2 * edge);
-      const bend = r < 1 ? Math.min(0.98, r * curvature) : 0;
-      const i = (y * size + x) * 4;
-      pixels.data.set([
-        128 - nx / Math.max(r, 1e-3) * bend * 127,
-        128 - ny / Math.max(r, 1e-3) * bend * 127,
-        128,
-        255
-      ], i);
-    }
-    context.putImageData(pixels, 0, 0);
     const ns = "http://www.w3.org/2000/svg";
     this.svg = document.createElementNS(ns, "svg");
     this.svg.setAttribute("width", "0");
     this.svg.setAttribute("height", "0");
     this.svg.setAttribute("aria-hidden", "true");
     this.svg.style.position = "absolute";
-    this.svg.innerHTML = `<defs><filter id="${id}" x="0%" y="0%" width="100%" height="100%" color-interpolation-filters="sRGB"><feImage width="100%" height="100%" preserveAspectRatio="none" result="lens"/><feDisplacementMap in="SourceGraphic" in2="lens" xChannelSelector="R" yChannelSelector="G" scale="64"/></filter></defs>`;
-    this.svg.querySelector("feImage").setAttribute("href", map.toDataURL());
+    this.svg.innerHTML = `<defs><filter id="${id}" filterUnits="userSpaceOnUse" primitiveUnits="userSpaceOnUse" x="0" y="0" color-interpolation-filters="sRGB"><feImage x="0" y="0" preserveAspectRatio="none" result="lens"/><feDisplacementMap in="SourceGraphic" in2="lens" xChannelSelector="R" yChannelSelector="G" scale="64"/></filter></defs>`;
+    this.filter = this.svg.querySelector("filter");
+    this.mapImage = this.svg.querySelector("feImage");
     this.displace = this.svg.querySelector("feDisplacementMap");
     this.el = document.createElement("div");
     this.el.className = "siri-island-refraction";
@@ -674,14 +666,53 @@ var GlassRefraction = class {
     this.el.style.backdropFilter = `url(#${id})`;
     this.el.style.webkitBackdropFilter = `url(#${id})`;
     host.prepend(this.svg, this.el);
+    this.resizeObserver = new ResizeObserver(() => this.resize());
+    this.resizeObserver.observe(this.el);
+  }
+  resize() {
+    const width = this.el.clientWidth, height = this.el.clientHeight;
+    if (!width || !height || width === this.width && height === this.height) return;
+    this.width = width;
+    this.height = height;
+    this.diameter = Math.max(width, height);
+    const map = document.createElement("canvas");
+    const size = 512;
+    map.width = map.height = size;
+    const context = map.getContext("2d");
+    if (!context) return;
+    const pixels = context.createImageData(size, size);
+    for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) {
+      const nx = (x + 0.5) / (size / 2) - 1, ny = (y + 0.5) / (size / 2) - 1;
+      const r = Math.hypot(nx, ny);
+      const bend = r > 0 && r < 1 ? sphereDisplacement(r) / r : 0;
+      pixels.data.set([
+        Math.round(255 * (0.5 + nx * bend * width / this.diameter / (2 * MAP_RANGE))),
+        Math.round(255 * (0.5 + ny * bend * height / this.diameter / (2 * MAP_RANGE))),
+        128,
+        255
+      ], (y * size + x) * 4);
+    }
+    context.putImageData(pixels, 0, 0);
+    this.mapImage.setAttribute("href", map.toDataURL());
+    for (const node of [this.filter, this.mapImage]) {
+      node.setAttribute("width", String(width));
+      node.setAttribute("height", String(height));
+    }
+    this.setScale();
+  }
+  setScale() {
+    this.displace.setAttribute("scale", String((this.amount ?? 64) / 64 * (this.diameter || 0) * MAP_RANGE));
   }
   update(amount, ready) {
     if (!this.el) return;
     if (this.amount !== amount) {
-      this.displace.setAttribute("scale", String(amount));
       this.amount = amount;
+      this.setScale();
     }
     this.el.style.visibility = ready && amount > 0 ? "visible" : "hidden";
+  }
+  dispose() {
+    this.resizeObserver?.disconnect();
   }
 };
 
@@ -810,6 +841,7 @@ var Island = class {
     this.motion.removeEventListener("change", this.change);
     document.removeEventListener("visibilitychange", this.change);
     this.renderer?.dispose();
+    this.glass.dispose();
     this.ui.classList.remove("siri-island-enabled");
     this.el.remove();
   }

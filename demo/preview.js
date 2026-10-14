@@ -32,7 +32,7 @@ document.getElementById('sequence').addEventListener('click', () => {
 levelInput.addEventListener('input', () => document.getElementById('level-output').textContent = `${Math.round(Number(levelInput.value) * 100)}%`);
 function appearance() {
   for (const id of ['left', 'top', 'bulge-width', 'bulge-stretch', 'refraction']) {
-    document.getElementById(id + '-output').textContent = document.getElementById(id).value + (id === 'left' ? '%' : id === 'top' || id === 'refraction' ? 'px' : '×');
+    document.getElementById(id + '-output').textContent = document.getElementById(id).value + (id === 'left' ? '%' : id === 'top' ? 'px' : id === 'refraction' ? '' : '×');
   }
   document.getElementById('voice-satellite-custom-css').textContent = `#voice-satellite-ui {
     --siri-island-enabled: ${Number(document.getElementById('enabled').checked)};

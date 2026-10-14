@@ -130,6 +130,7 @@ class Island {
     this.motion.removeEventListener('change', this.change);
     document.removeEventListener('visibilitychange', this.change);
     this.renderer?.dispose();
+    this.glass.dispose();
     this.ui.classList.remove('siri-island-enabled');
     this.el.remove();
   }
