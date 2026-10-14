@@ -24,7 +24,7 @@ SOFTWARE.
 */
 
 // src/island.css
-var island_default = '/* Scoped to the opt-in host: other Voice Satellite skins stay untouched. */\n#voice-satellite-ui.siri-island-enabled .vs-rainbow-bar,\n#voice-satellite-ui.siri-island-enabled .vs-rainbow-bar::before,\n#voice-satellite-ui.siri-island-enabled .vs-rainbow-bar::after {\n  opacity: 0 !important;\n  animation: none !important;\n  filter: none !important;\n  pointer-events: none !important;\n}\n#voice-satellite-ui.siri-island-enabled .vs-blur-overlay {\n  backdrop-filter: blur(var(--siri-island-backdrop-blur, 2px));\n  -webkit-backdrop-filter: blur(var(--siri-island-backdrop-blur, 2px));\n}\n#voice-satellite-ui .siri-island {\n  position: fixed;\n  top: 0;\n  --siri-island-offset: max(0px, calc(env(safe-area-inset-top, 0px) + var(--siri-island-top, 20px)));\n  left: 50%;\n  --siri-island-size: min(var(--siri-island-width, 240px), 80vw);\n  width: var(--siri-island-size);\n  transform: translateX(-50%);\n  z-index: 10002;\n  pointer-events: none;\n  opacity: 0;\n  visibility: hidden;\n  transition: opacity 180ms ease, visibility 180ms;\n  contain: layout style;\n}\n#voice-satellite-ui .siri-island[data-visible="true"] { opacity: 1; visibility: visible; }\n#voice-satellite-ui .siri-island canvas { width: 100%; height: calc(var(--siri-island-size) * 112 / 144 + var(--siri-island-offset)); display: block; }\n#voice-satellite-ui .siri-island-label {\n  display: block;\n  color: var(--siri-island-label-color, #f3f4fb);\n  background: rgba(12, 15, 24, 0.82);\n  border: 1px solid rgba(255,255,255,.1);\n  border-radius: 30px;\n  padding: 6px 14px;\n  width: max-content;\n  max-width: 100%;\n  box-sizing: border-box;\n  margin: -5px auto 0;\n  text-align: center;\n  font: 500 12px/1.3 system-ui, sans-serif;\n  letter-spacing: .02em;\n}\n#voice-satellite-ui .siri-island[data-state="idle"] .siri-island-label { visibility: hidden; }\n#voice-satellite-ui .siri-island-fallback {\n  display: none;\n  height: 132px;\n  margin: 24px 12%;\n  border-radius: 42%;\n  border: 1px solid #8a8eaa;\n  background: radial-gradient(ellipse at 50% 95%, #fff9, transparent 30%), linear-gradient(#000f 10%, #0002 75%);\n  box-shadow: inset 0 -2px 4px #cdd9e5, 0 16px 35px #0004;\n  align-items: center;\n  justify-content: center;\n  gap: 6px;\n}\n#voice-satellite-ui .siri-island-fallback i {\n  width: 15px; height: 22px; border-radius: 50%;\n  background: #005fff; box-shadow: 0 0 18px currentColor;\n}\n#voice-satellite-ui .siri-island-fallback i:nth-child(2) { background: #00ffde; height: 36px; }\n#voice-satellite-ui .siri-island-fallback i:nth-child(3) { background: #fa1f1f; height: 30px; }\n#voice-satellite-ui .siri-island-fallback i:nth-child(4) { background: #ff930d; height: 18px; }\n#voice-satellite-ui .siri-island[data-renderer="fallback"] canvas { display: none; }\n#voice-satellite-ui .siri-island[data-renderer="fallback"] .siri-island-fallback { display: flex; }\n@media (max-height: 540px) {\n  #voice-satellite-ui .siri-island { --siri-island-size: min(var(--siri-island-width, 170px), 40vw); }\n}\n@media (prefers-reduced-motion: reduce) {\n  #voice-satellite-ui .siri-island { transition: none; }\n}\n\n#voice-satellite-ui .siri-island[data-shape="circle"] .siri-island-fallback {\n  aspect-ratio: 1; height: auto; border-radius: 50%; margin: var(--siri-island-offset) 20% 16px;\n}\n\n#voice-satellite-ui .siri-island-refraction {\n  position: absolute;\n  left: calc(50% - var(--siri-island-size) * 53 / 144);\n  top: calc(var(--siri-island-offset) + var(--siri-island-size) * 5 / 144);\n  width: calc(var(--siri-island-size) * 106 / 144);\n  height: calc(var(--siri-island-size) * 82 / 144);\n  border-radius: 44%;\n  visibility: hidden;\n  pointer-events: none;\n}\n#voice-satellite-ui .siri-island[data-shape="circle"] .siri-island-refraction {\n  left: calc(50% - var(--siri-island-size) * 43 / 144);\n  width: calc(var(--siri-island-size) * 86 / 144);\n  height: calc(var(--siri-island-size) * 86 / 144);\n  border-radius: 50%;\n}\n#voice-satellite-ui .siri-island canvas { position: relative; }\n';
+var island_default = '/* Scoped to the opt-in host: other Voice Satellite skins stay untouched. */\n#voice-satellite-ui.siri-island-enabled .vs-rainbow-bar,\n#voice-satellite-ui.siri-island-enabled .vs-rainbow-bar::before,\n#voice-satellite-ui.siri-island-enabled .vs-rainbow-bar::after {\n  opacity: 0 !important;\n  animation: none !important;\n  filter: none !important;\n  pointer-events: none !important;\n}\n#voice-satellite-ui.siri-island-enabled .vs-blur-overlay {\n  backdrop-filter: blur(var(--siri-island-backdrop-blur, 2px));\n  -webkit-backdrop-filter: blur(var(--siri-island-backdrop-blur, 2px));\n  background-image: linear-gradient(to top, rgba(0,0,0,.94), rgba(0,0,0,.64) 18%, transparent 54%) !important;\n}\n#voice-satellite-ui.siri-island-enabled .vs-chat-msg {\n  color: #fff !important;\n  font-weight: 300 !important;\n  font-size: calc(clamp(18px, 2.4vw, 30px) * var(--vs-text-scale, 1));\n  text-shadow: 0 2px 12px rgba(0,0,0,.5);\n  max-width: 100%;\n  text-align: left;\n  align-self: stretch;\n}\n#voice-satellite-ui.siri-island-enabled .vs-chat-container {\n  padding: clamp(22px, 3.5vw, 38px);\n  border: 1px solid rgba(255,255,255,.15);\n  border-radius: clamp(28px, 4vw, 48px);\n  background: radial-gradient(ellipse at 50% 112%, rgba(255,247,231,.24), transparent 40%),\n    linear-gradient(to bottom, #000 0%, rgba(0,0,0,.97) 68%, rgba(0,0,0,.72) 100%);\n  backdrop-filter: blur(12px) saturate(115%);\n  -webkit-backdrop-filter: blur(12px) saturate(115%);\n  box-shadow: inset 0 -1px 1px rgba(255,255,255,.65), inset 0 -12px 30px -25px #fff,\n    0 12px 48px rgba(0,0,0,.28);\n  max-height: min(58vh, 600px);\n  overflow-y: auto;\n  scrollbar-width: thin;\n  scrollbar-color: #ffffff45 transparent;\n}\n#voice-satellite-ui.siri-island-enabled .vs-chat-container:not(.announcement-mode) {\n  left: 16px;\n  right: 16px;\n  width: auto;\n  max-width: 900px;\n  margin-inline: auto;\n  bottom: max(24px, env(safe-area-inset-bottom, 0px)) !important;\n}\n#voice-satellite-ui.siri-island-enabled .vs-chat-msg.assistant {\n  max-height: none;\n  overflow-y: visible;\n}\n#voice-satellite-ui .siri-island {\n  position: fixed;\n  top: 0;\n  --siri-island-offset: max(0px, calc(env(safe-area-inset-top, 0px) + var(--siri-island-top, 20px)));\n  left: 50%;\n  --siri-island-size: min(var(--siri-island-width, 240px), 80vw);\n  width: var(--siri-island-size);\n  transform: translateX(-50%);\n  z-index: 10002;\n  pointer-events: none;\n  opacity: 0;\n  visibility: hidden;\n  transition: opacity 180ms ease, visibility 180ms;\n  contain: layout style;\n}\n#voice-satellite-ui .siri-island[data-visible="true"] { opacity: 1; visibility: visible; }\n#voice-satellite-ui .siri-island canvas { width: 100%; height: calc(var(--siri-island-size) * 112 / 144 + var(--siri-island-offset)); display: block; }\n#voice-satellite-ui .siri-island-label {\n  display: block;\n  color: var(--siri-island-label-color, #f3f4fb);\n  background: rgba(12, 15, 24, 0.82);\n  border: 1px solid rgba(255,255,255,.1);\n  border-radius: 30px;\n  padding: 6px 14px;\n  width: max-content;\n  max-width: 100%;\n  box-sizing: border-box;\n  margin: -5px auto 0;\n  text-align: center;\n  font: 500 12px/1.3 system-ui, sans-serif;\n  letter-spacing: .02em;\n}\n#voice-satellite-ui .siri-island[data-state="idle"] .siri-island-label { visibility: hidden; }\n#voice-satellite-ui .siri-island-fallback {\n  display: none;\n  height: 132px;\n  margin: 24px 12%;\n  border-radius: 42%;\n  border: 1px solid #8a8eaa;\n  background: radial-gradient(ellipse at 50% 95%, #fff9, transparent 30%), linear-gradient(#000f 10%, #0002 75%);\n  box-shadow: inset 0 -2px 4px #cdd9e5, 0 16px 35px #0004;\n  align-items: center;\n  justify-content: center;\n  gap: 6px;\n}\n#voice-satellite-ui .siri-island-fallback i {\n  width: 15px; height: 22px; border-radius: 50%;\n  background: #005fff; box-shadow: 0 0 18px currentColor;\n}\n#voice-satellite-ui .siri-island-fallback i:nth-child(2) { background: #00ffde; height: 36px; }\n#voice-satellite-ui .siri-island-fallback i:nth-child(3) { background: #fa1f1f; height: 30px; }\n#voice-satellite-ui .siri-island-fallback i:nth-child(4) { background: #ff930d; height: 18px; }\n#voice-satellite-ui .siri-island[data-renderer="fallback"] canvas { display: none; }\n#voice-satellite-ui .siri-island[data-renderer="fallback"] .siri-island-fallback { display: flex; }\n@media (max-height: 540px) {\n  #voice-satellite-ui .siri-island { --siri-island-size: min(var(--siri-island-width, 170px), 40vw); }\n}\n@media (prefers-reduced-motion: reduce) {\n  #voice-satellite-ui .siri-island { transition: none; }\n}\n\n#voice-satellite-ui .siri-island[data-shape="circle"] .siri-island-fallback {\n  aspect-ratio: 1; height: auto; border-radius: 50%; margin: var(--siri-island-offset) 20% 16px;\n}\n\n#voice-satellite-ui .siri-island-refraction {\n  position: absolute;\n  left: calc(50% - var(--siri-island-size) * 53 / 144);\n  top: calc(var(--siri-island-offset) + var(--siri-island-size) * 5 / 144);\n  width: calc(var(--siri-island-size) * 106 / 144);\n  height: calc(var(--siri-island-size) * 82 / 144);\n  border-radius: 44%;\n  visibility: hidden;\n  pointer-events: none;\n}\n#voice-satellite-ui .siri-island[data-shape="circle"] .siri-island-refraction {\n  left: calc(50% - var(--siri-island-size) * 43 / 144);\n  width: calc(var(--siri-island-size) * 86 / 144);\n  height: calc(var(--siri-island-size) * 86 / 144);\n  border-radius: 50%;\n}\n#voice-satellite-ui .siri-island canvas { position: relative; }\n';
 
 // src/shader.js
 var fragmentShader = `
@@ -181,32 +181,21 @@ var fragmentShader = `
                 return min(a, b) - h * h * k * 0.25;
             }
 
-            // Original implementation; visual inspiration: 40973894's Siri Wave / Fluid Dots.
-            vec3 fluidDots(vec2 p, float time) {
-                float t = -time * 0.65;
-                float gather = 0.5 + 0.5 * sin(t * 0.85);
-                float distanceField = 10.0;
-                vec3 tint = vec3(0.0);
-                float weight = 0.0;
-                for (int i = 0; i < 5; i++) {
-                    float f = float(i);
-                    float angle = f * 1.256637 + t * 0.45;
-                    float radius = mix(0.12, 0.40, gather) + 0.035 * sin(t * 1.7 + f);
-                    vec2 center = vec2(cos(angle), sin(angle)) * radius;
-                    center.y *= 0.72;
-                    float size = 0.105 + 0.025 * sin(t * 1.3 + f * 2.0);
-                    float d = length(p - center) - size;
-                    distanceField = smoothUnion(distanceField, d, 0.18);
-                    float w = exp(-length(p - center) * 9.0);
-                    vec3 c = 0.55 + 0.45 * cos(vec3(0.0, 2.1, 4.2) + f * 1.25 + t * 0.25);
-                    tint += c * w;
-                    weight += w;
-                }
-                tint /= max(weight, 0.001);
-                float core = 1.0 - smoothstep(-0.025, 0.018, distanceField);
-                float glow = exp(-max(distanceField, 0.0) * 20.0) * 0.22;
-                float edge = exp(-abs(distanceField) * 65.0);
-                return mix(tint, vec3(1.0), 0.65) * core + tint * glow + vec3(0.3) * edge;
+            // Original motion; visual inspiration: 40973894's Siri Wave / Fluid Dots.
+            float dotSpread(float time) {
+                // Six droplets periodically rejoin at the center before opening.
+                return 1.0 - smoothstep(0.55, 1.0, 0.5 + 0.5 * sin(-time * 0.85 * 0.85));
+            }
+
+            vec2 dotCenter(float index, float time) {
+                float t = -time * 0.85;
+                float angle = index * (PI / 3.0) + t * 0.65;
+                float radius = 0.40 + 0.025 * sin(t * 1.7 + index);
+                return vec2(cos(angle), sin(angle) * 0.72) * radius * 43.0;
+            }
+
+            float dotSize(float index, float time) {
+                return (0.080 + 0.018 * sin(-time * 0.85 * 1.3 + index * 2.0)) * 43.0;
             }
 
             void main() {
@@ -315,52 +304,64 @@ var fragmentShader = `
                     float edgeZone = clamp(1.0 - (distFromBorder / max(u_waveEdgeBand, 1.0)), 0.0, 1.0);
                     float edgeMask = pow(edgeZone, u_wavePower);
 
+                    // Finish contracting all curves into one droplet, hold it
+                    // briefly, then separate into six orbiting droplets. The
+                    // same stages reverse continuously when speech resumes.
+                    float morph = smoothstep(0.0, 0.44, u_thinking);
+                    float spread = smoothstep(0.58, 1.0, u_thinking) * dotSpread(u_time);
+                    float liquidField = 10000.0;
+                    vec3 liquidTint = vec3(0.0);
+                    float tintWeight = 0.0;
+
                     for (int i = 0; i < 6; i++) {
                         if (i >= activeWaves) break;
 
                         float numW = max(float(activeWaves - 1), 1.0);
                         float staggerStart = (float(i) / numW) * 0.42;
-                        float staggerDuration = 0.58;
-                        float rawWaveProg = clamp((u_waveIntro - staggerStart) / staggerDuration, 0.0, 1.0);
+                        float rawWaveProg = clamp((u_waveIntro - staggerStart) / 0.58, 0.0, 1.0);
                         float waveProgress = rawWaveProg * rawWaveProg * (3.0 - 2.0 * rawWaveProg);
-
-                        float dispersionOffset = (float(i) - 1.5) * (u_waveDispersion * 0.25);
+                        float dispersionOffset = (float(i) - 2.0) * (u_waveDispersion * 0.25);
                         float waveDispMag = (edgeZone * u_waveRefract * 4.0) + (dispersionOffset * edgeMask);
-
                         vec2 waveOffset = norm2D * (waveDispMag * edgeMask * u_progress);
-                        vec2 pWave = p - waveOffset;
 
-                        vec2 wp = vec2(pWave.x, pWave.y + 0.5 * u_progress) / currentW;
+                        // The curved capsule first becomes a centered circle;
+                        // only then does its center move to an orbit position.
+                        vec2 center = dotCenter(float(i), u_time) * spread;
+                        vec2 pWave = p - waveOffset * (1.0 - morph) - center;
+                        float contraction = max(0.001, 1.0 - morph);
+                        float span = currentW * spindleWidth * 0.5 * (1.0 - morph);
+                        vec2 wp = vec2(pWave.x / contraction,
+                            pWave.y + 0.5 * u_progress * (1.0 - morph)) / currentW;
                         float nx = (wp.x / spindleWidth) + 0.5;
+                        float envelope = pow(max(sin(clamp(nx, 0.0, 1.0) * PI), 0.0), pinTaper);
+                        float eFade = max(edgeFade, 0.001);
+                        float fadeMask = smoothstep(0.0, eFade, nx) * (1.0 - smoothstep(1.0 - eFade, 1.0, nx));
+                        float baseAngle = clamp(wp.x, -spindleWidth * 0.5, spindleWidth * 0.5) * xScale;
+                        float dynamicHarmonic = 1.0 + 0.12 * sin(u_time * 1.5 + float(i) * 1.3);
+                        float targetAmp = ampWeights[i] * dynamicHarmonic;
+                        float amp = mix(u_introStartAmp, targetAmp, waveProgress) * yScale * envelope;
+                        float ph = phaseDistance * phWeights[i] * waveProgress;
+                        float waveY = sin(baseAngle + u_time + ph) * amp * (1.0 - morph);
+                        float dist = abs(wp.y + waveY);
+                        float thickMult = mix(1.0, thickWeights[i], waveProgress);
+                        float currentThickness = lineThickness * envelope * thickMult;
 
                         if (nx > 0.0 && nx < 1.0) {
-                            float envelope = pow(sin(nx * PI), pinTaper);
-                            float eFade = max(edgeFade, 0.001);
-                            float fadeMask = smoothstep(0.0, eFade, nx) * (1.0 - smoothstep(1.0 - eFade, 1.0, nx));
-
-                            float baseAngle = wp.x * xScale;
-                            float dynamicHarmonic = 1.0 + 0.12 * sin(u_time * 1.5 + float(i) * 1.3);
-                            float targetAmp = ampWeights[i] * dynamicHarmonic;
-
-                            float currentYScale = yScale * envelope;
-                            float amp = mix(u_introStartAmp, targetAmp, waveProgress) * currentYScale;
-                            float ph = phaseDistance * phWeights[i] * waveProgress;
-
-                            float waveY = sin(baseAngle + u_time + ph) * amp;
-                            float dist = abs(wp.y + waveY);
-
-                            float targetThickMult = thickWeights[i];
-                            float thickMult = mix(1.0, targetThickMult, waveProgress);
-                            float currentThickness = lineThickness * envelope * thickMult;
-
                             float w = pow(clamp(currentThickness / max(dist + currentThickness * 0.32, 0.00001), 0.0, 1.0), glowFalloff);
                             w *= fillOpacity;
-
                             waveAccum += w * uColors[i] * fadeMask;
                             totalDensity += w * fadeMask;
-
                             waveIntersectCount += (1.0 - smoothstep(0.0, max(currentThickness * 2.2, 0.00001), dist));
                         }
+
+                        float radius = mix(currentThickness * currentW,
+                            mix(4.5, dotSize(float(i), u_time), spread), morph);
+                        float curveDistance = length(vec2(max(abs(pWave.x) - span, 0.0),
+                            (wp.y + waveY) * currentW)) - radius;
+                        liquidField = smoothUnion(liquidField, curveDistance, mix(1.4, 4.7, spread));
+                        float tint = exp(-length(pWave) * 0.2);
+                        liquidTint += uColors[i] * tint;
+                        tintWeight += tint;
                     }
 
                     if (totalDensity > hotCoreThreshold && waveIntersectCount >= 2.6) {
@@ -368,7 +369,13 @@ var fragmentShader = `
                         waveAccum = mix(waveAccum, vec3(1.0) * hotCoreIntensity, whiteFactor * 0.85);
                     }
 
-                    accumulatedWave = waveAccum * glowIntensity * u_waveFade;
+                    liquidTint /= max(tintWeight, 0.001);
+                    float core = 1.0 - smoothstep(-0.9, 0.8, liquidField);
+                    float glow = exp(-max(liquidField, 0.0) * 0.5) * 0.14;
+                    float liquidEdge = exp(-abs(liquidField) * 1.5) * 0.1;
+                    vec3 liquidLight = mix(liquidTint, vec3(1.0), 0.92) * core + liquidTint * glow + liquidEdge;
+                    accumulatedWave = mix(waveAccum * glowIntensity, liquidLight,
+                        smoothstep(0.05, 0.55, morph)) * u_waveFade;
                 }
 
                 // A transmissive lower hemisphere, a dark upper cap and white caustic.
@@ -379,7 +386,7 @@ var fragmentShader = `
                 float horizon = exp(-pow((p.y - 4.0 + 3.0 * cos(p.x / 28.0)) / 1.9, 2.0)) *
                     exp(-pow(p.x / 37.0, 4.0));
                 float sheen = (rim * 0.75 + bottomLight * u_bottomGlow + horizon * 0.18) * u_progress;
-                vec3 lights = accumulatedWave * (1.0 - u_thinking) + fluidDots(p / 43.0, u_time) * u_thinking * u_waveFade;
+                vec3 lights = accumulatedWave;
                 lights += vec3(1.0, 0.97, 0.93) * sheen;
                 float lightAlpha = clamp(max(max(lights.r, lights.g), lights.b), 0.0, 1.0);
                 float alpha = max(bodyAlpha, lightAlpha);
@@ -517,7 +524,7 @@ var IslandRenderer = class {
       gl.uniform2f(this.location("u_resolution"), 144, 112);
       gl.uniform4f(this.location("u_shapeParams"), 53, 41, 0.01, 0);
       gl.uniform3f(this.location("u_glassTint"), 0.94, 0.96, 1);
-      gl.uniform1i(this.location("activeWaves"), 4);
+      gl.uniform1i(this.location("activeWaves"), 6);
       gl.uniform3fv(this.location("uColors[0]"), COLORS.flatMap((hex) => {
         const n = parseInt(hex, 16);
         return [(n >> 16 & 255) / 255, (n >> 8 & 255) / 255, (n & 255) / 255];
@@ -580,7 +587,10 @@ var IslandRenderer = class {
     const liquidMotion = !reducedMotion && entrance;
     this.drop = Math.max(0, Math.min(1, this.drop + (active ? 1 : -1) * elapsed / (active ? 0.95 : 0.8)));
     this.spring.target = active || liquidMotion && this.drop > 0 ? 1 : 0;
-    this.thinking += (Number(state === "processing") - this.thinking) * (1 - Math.exp(-delta * 8));
+    this.thinking = Math.max(0, Math.min(
+      1,
+      this.thinking + (state === "processing" ? 1 : -1) * delta / 0.95
+    ));
     this.float("u_drop", reducedMotion || !entrance ? 1 : this.drop);
     this.float("u_circle", Number(circle));
     this.float("u_bodyOpacity", opacity);

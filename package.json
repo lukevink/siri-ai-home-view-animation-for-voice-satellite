@@ -1,14 +1,14 @@
 {
-  "name": "siri-ai-home-view-animation-for-voice-satellite",
-  "version": "0.2.1",
+  "name": "siri-homeview-hass-animation",
+  "version": "0.2.2",
   "private": true,
   "type": "module",
   "license": "AGPL-3.0-only",
   "repository": {
     "type": "git",
-    "url": "https://github.com/lukevink/siri-ai-home-view-animation-for-voice-satellite.git"
+    "url": "https://github.com/lukevink/siri-homeview-hass-animation.git"
   },
-  "homepage": "https://github.com/lukevink/siri-ai-home-view-animation-for-voice-satellite#readme",
+  "homepage": "https://github.com/lukevink/siri-homeview-hass-animation#readme",
   "scripts": {
     "build": "node scripts/build.mjs",
     "preview": "node scripts/serve.mjs",

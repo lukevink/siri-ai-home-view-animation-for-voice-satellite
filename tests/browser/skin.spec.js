@@ -110,3 +110,26 @@ test('circle, live glass settings and legacy island switch without duplicate ren
   await page.locator('#enabled').check();
   await expect(page.locator('.siri-island-refraction')).toHaveCount(1);
 });
+
+test('long spoken replies stay inside the rounded caption panel and remain scrollable', async ({ page }) => {
+  await page.setViewportSize({ width: 600, height: 800 });
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Speak', exact: true }).click();
+  await page.locator('.vs-chat-msg.assistant').evaluate(el => {
+    el.textContent = 'Here is a longer answer that remains readable on a tablet. '.repeat(30);
+  });
+  const panel = page.locator('.vs-chat-container');
+  await expect(panel).toBeVisible();
+  const layout = await panel.evaluate(el => {
+    const r = el.getBoundingClientRect();
+    const message = getComputedStyle(el.querySelector('.assistant'));
+    return { left: r.left, right: r.right, bottom: r.bottom, width: innerWidth, height: innerHeight,
+      overflow: el.scrollHeight > el.clientHeight, weight: message.fontWeight, color: message.color };
+  });
+  expect(layout.left).toBeGreaterThanOrEqual(0);
+  expect(layout.right).toBeLessThanOrEqual(layout.width);
+  expect(layout.bottom).toBeLessThanOrEqual(layout.height);
+  expect(layout.overflow).toBe(true);
+  expect(layout.weight).toBe('300');
+  expect(layout.color).toBe('rgb(255, 255, 255)');
+});

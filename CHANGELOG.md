@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.2
+
+- Voice curves gather into one white droplet, then split into six smaller, faster liquid dots; the transition reverses when speech resumes.
+- White lightweight captions sit in one rounded black panel with a lower glow and backdrop gradient.
+- Rename the repository to siri-homeview-hass-animation and add an animated README preview.
+
 ## 0.2.1
 
 - Return the orb to the bezel on dismissal, reversing the liquid drop.
