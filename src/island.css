@@ -54,7 +54,7 @@
   position: fixed;
   top: 0;
   --siri-island-offset: max(0px, calc(env(safe-area-inset-top, 0px) + var(--siri-island-top, 20px)));
-  left: 50%;
+  left: var(--siri-island-left, 50%);
   --siri-island-size: min(var(--siri-island-width, 240px), 80vw);
   width: var(--siri-island-size);
   transform: translateX(-50%);

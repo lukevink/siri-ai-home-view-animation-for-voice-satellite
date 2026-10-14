@@ -71,6 +71,9 @@ No Python component, card YAML, or access token is required. Keep the copyright/
 | --- | --- | --- |
 | `--siri-island-shape` | `circle` | `circle` selects the spherical orb; `island` retains the rounded shape. |
 | `--siri-island-width` | `240px` | Width of the animation canvas; the visible orb occupies approximately 60% of it. |
+| `--siri-island-left` | `50%` | Horizontal center of the orb and bezel bulge. Use a percentage or pixel value. |
+| `--siri-island-bulge-width` | `1` | Bezel bulge width multiplier, from `0` to `1.4`. |
+| `--siri-island-bulge-stretch` | `1` | Downward bezel bulge stretch multiplier, from `0` to `2.5`. |
 | `--siri-island-top` | `20px` | Gap below the safe-area inset after the drop settles. The entrance always starts at the viewport top. |
 | `--siri-island-glass-opacity` | `0.14` | Lower glass opacity from `0` to `1`; the upper cap stays dark. |
 | `--siri-island-bottom-glow` | `0.8` | White lower glow strength from `0` to `2`. |

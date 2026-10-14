@@ -9,6 +9,8 @@ export const fragmentShader = `
             uniform float u_time;
             uniform float u_progress;
             uniform float u_drop;
+            uniform float u_bulgeWidth;
+            uniform float u_bulgeStretch;
             uniform float u_circle;
             uniform float u_thinking;
             uniform float u_bodyOpacity;
@@ -156,14 +158,9 @@ export const fragmentShader = `
             }
 
             // Original motion; visual inspiration: 40973894's Siri Wave / Fluid Dots.
-            float dotSpread(float time) {
-                // Six droplets periodically rejoin at the center before opening.
-                return 1.0 - smoothstep(0.55, 1.0, 0.5 + 0.5 * sin(-time * 0.85 * 0.85));
-            }
-
             vec2 dotCenter(float index, float time) {
                 float t = -time * 0.85;
-                float angle = index * (PI / 3.0) + t * 0.65;
+                float angle = index * (2.0 * PI / 5.0) + t * 0.65;
                 float radius = 0.40;
                 return vec2(cos(angle), sin(angle)) * radius * 43.0;
             }
@@ -176,16 +173,13 @@ export const fragmentShader = `
                 if (u_drop <= 0.0) { gl_FragColor = vec4(0.0); return; }
                 vec2 uv = vec2(vUv.x, 1.0 - vUv.y) * u_resolution;
                 float currentH = mix(41.0, 43.0, u_circle);
-                // A small droplet first pulls out of the bezel. Most of its
-                // expansion happens AFTER pinch-off, matching the reference's
-                // narrow teardrop becoming a full round orb below a flat edge.
-                float detach = smoothstep(0.10, 0.52, u_drop);
-                float expand = smoothstep(0.52, 0.96, u_drop);
+                // Grow during the fall; only position overshoots and rebounds.
+                float detach = smoothstep(0.0, 0.72, u_drop);
+                float expand = smoothstep(0.0, 0.78, u_drop);
                 float finalY = u_top + currentH + 5.0;
-                float centerY = mix(-12.0, finalY * 0.62, detach);
-                centerY = mix(centerY, finalY, expand);
-                float grow = mix(0.28, 0.52, detach);
-                grow = mix(grow, 1.0, expand);
+                float bounce = sin(smoothstep(0.48, 1.0, u_drop) * PI) * 5.5;
+                float centerY = mix(-12.0, finalY, detach) + bounce;
+                float grow = mix(0.28, 1.0, expand);
                 vec2 p = uv - vec2(72.0, centerY);
                 p /= grow;
                 float stretch = 1.0 + 0.30 * sin(detach * PI) + 0.16 * (1.0 - expand) * detach;
@@ -198,14 +192,14 @@ export const fragmentShader = `
                 float along = clamp(uv.y / neckEnd, 0.0, 1.0);
                 float pinch = 1.0 - smoothstep(0.28, 0.50, u_drop);
                 float birth = smoothstep(0.0, 0.16, u_drop);
-                float neckWidth = (3.0 + 40.0 * pow(1.0 - along, 2.8)) * pinch * birth;
+                float neckWidth = (3.0 + 40.0 * u_bulgeWidth * pow(1.0 - along, 2.8)) * pinch * birth;
                 float dNeck = max(abs(uv.x - 72.0) - neckWidth, uv.y - neckEnd);
                 // A broad, shallow pool grows directly out of the screen edge.
                 // Its curved shoulders narrow into the stretching neck, then
                 // retract after pinch-off. Reversing u_drop rejoins that pool.
                 float retract = 1.0 - smoothstep(0.30, 0.66, u_drop);
-                float lipWidth = max(0.01, 47.0 * birth * retract);
-                float lipDepth = max(0.01, 23.0 * birth * retract);
+                float lipWidth = max(0.01, 47.0 * u_bulgeWidth * birth * retract);
+                float lipDepth = max(0.01, 23.0 * u_bulgeStretch * birth * retract);
                 float shoulder = max(0.0, 1.0 - pow((uv.x - 72.0) / lipWidth, 2.0));
                 float dLip = uv.y - lipDepth * shoulder * shoulder;
                 dNeck = pinch > 0.001 ? min(dNeck, dLip) : dLip;
@@ -287,11 +281,11 @@ export const fragmentShader = `
                     float edgeZone = clamp(1.0 - (distFromBorder / max(u_waveEdgeBand, 1.0)), 0.0, 1.0);
                     float edgeMask = pow(edgeZone, u_wavePower);
 
-                    // Finish contracting all curves into one droplet, hold it
-                    // briefly, then separate into six orbiting droplets. The
+                    // Contract the curves into one droplet, then immediately
+                    // separate into five orbiting droplets. The
                     // same stages reverse continuously when speech resumes.
-                    float morph = smoothstep(0.0, 0.44, u_thinking);
-                    float spread = smoothstep(0.58, 1.0, u_thinking) * dotSpread(u_time);
+                    float morph = smoothstep(0.0, 0.40, u_thinking);
+                    float spread = smoothstep(0.40, 1.0, u_thinking);
                     float liquidField = 10000.0;
                     vec3 liquidTint = vec3(0.0);
                     float tintWeight = 0.0;
@@ -309,7 +303,8 @@ export const fragmentShader = `
 
                         // The curved capsule first becomes a centered circle;
                         // only then does its center move to an orbit position.
-                        vec2 center = dotCenter(float(i), u_time) * spread;
+                        float dotIndex = mod(float(i), 5.0);
+                        vec2 center = dotCenter(dotIndex, u_time) * spread;
                         vec2 pWave = p - waveOffset * (1.0 - morph) - center;
                         float contraction = max(0.001, 1.0 - morph);
                         float span = currentW * spindleWidth * 0.5 * (1.0 - morph);
@@ -338,10 +333,12 @@ export const fragmentShader = `
                         }
 
                         float radius = mix(currentThickness * currentW,
-                            mix(4.5, dotSize(float(i), u_time), spread), morph);
+                            mix(4.5, dotSize(dotIndex, u_time), spread), morph);
                         float curveDistance = length(vec2(max(abs(pWave.x) - span, 0.0),
                             (wp.y + waveY) * currentW)) - radius;
-                        liquidField = smoothUnion(liquidField, curveDistance, mix(1.4, 4.7, spread));
+                        if (i < 5 || u_thinking < 0.40) {
+                            liquidField = smoothUnion(liquidField, curveDistance, mix(1.4, 4.7, spread));
+                        }
                         float tint = exp(-length(pWave) * 0.2);
                         liquidTint += uColors[i] * tint;
                         tintWeight += tint;

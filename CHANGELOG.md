@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.5
+
+- Contract voice waves into one dot and expand into five spinning dots in 550 ms.
+- Grow the orb during its 650 ms descent, with a small position-only bounce.
+- Add horizontal position, bezel bulge width, and bulge stretch settings, with preview sliders alongside resting height.
+
+
 ## 0.2.4
 
 - Expand the conversation caption panel across the screen with matching side and bottom margins.

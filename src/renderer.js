@@ -133,17 +133,19 @@ export class IslandRenderer {
     this.thinking = 0;
   }
 
-  render(delta, { state, level, reducedMotion = false, circle = false, opacity = 0.14, bottomGlow = 0.8, entrance = true, elapsed = delta }) {
+  render(delta, { state, level, reducedMotion = false, circle = false, opacity = 0.14, bottomGlow = 0.8, entrance = true, bulgeWidth = 1, bulgeStretch = 1, elapsed = delta }) {
     const active = state !== 'idle';
     const liquidMotion = !reducedMotion && entrance;
-    this.drop = Math.max(0, Math.min(1, this.drop + (active ? 1 : -1) * elapsed / (active ? 0.95 : 0.8)));
+    this.drop = Math.max(0, Math.min(1, this.drop + (active ? 1 : -1) * elapsed / (active ? 0.65 : 0.8)));
     // Keep the orb full-sized while it rises. Collapse only after it has
     // merged into the bezel, rather than shrinking to a pill in mid-air.
     this.spring.target = active || (liquidMotion && this.drop > 0) ? 1 : 0;
     this.thinking = Math.max(0, Math.min(1,
-      this.thinking + (state === 'processing' ? 1 : -1) * delta / 0.95));
+      this.thinking + (state === 'processing' ? 1 : -1) * elapsed / 0.55));
     this.float('u_drop', reducedMotion || !entrance ? 1 : this.drop);
     this.float('u_circle', Number(circle));
+    this.float('u_bulgeWidth', bulgeWidth);
+    this.float('u_bulgeStretch', bulgeStretch);
     this.float('u_bodyOpacity', opacity);
     this.float('u_bottomGlow', bottomGlow);
     this.float('u_thinking', reducedMotion ? Number(state === 'processing') : this.thinking);
