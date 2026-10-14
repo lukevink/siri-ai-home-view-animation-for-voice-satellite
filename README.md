@@ -40,7 +40,7 @@ This repository is designed for **HACS custom repository installation**, not yet
      --siri-island-glass-opacity: 0.14;
      --siri-island-bottom-glow: 0.8;
      --siri-island-width: 240px;
-     --siri-island-top: 20px;
+     --siri-island-top: calc(var(--siri-island-width, 240px) * 0.096);
      --siri-island-backdrop-blur: 2px;
    }
    ```
@@ -74,12 +74,14 @@ No Python component, card YAML, or access token is required. Keep the copyright/
 | `--siri-island-left` | `50%` | Horizontal center of the orb and bezel bulge. Use a percentage or pixel value. |
 | `--siri-island-bulge-width` | `1` | Bezel bulge width multiplier, from `0` to `1.4`. |
 | `--siri-island-bulge-stretch` | `1` | Downward bezel bulge stretch multiplier, from `0` to `2.5`. |
-| `--siri-island-top` | `20px` | Gap below the safe-area inset after the drop settles. The entrance always starts at the viewport top. |
+| `--siri-island-top` | Proportional | Gap below the safe-area inset after the drop settles; defaults to approximately 16% of the circular orb diameter. Set a pixel value to override. The entrance always starts at the viewport top. |
 | `--siri-island-glass-opacity` | `0.14` | Lower glass opacity from `0` to `1`; the upper cap stays dark. |
 | `--siri-island-bottom-glow` | `0.8` | White lower glow strength from `0` to `2`. |
 | `--siri-island-refraction` | `18` | Live backdrop displacement strength from `0` to `40` pixels; `0` disables it. |
 | `--siri-island-entrance` | `drop` | Set `none` to disable the liquid entrance and return. Reduced-motion users also skip it. |
 | `--siri-island-backdrop-blur` | `2px` | Blur applied to Voice Satellite's full-screen backdrop. |
+
+Status labels (Listening, Thinking, Speaking) are hidden by default. Add the class `siri-island-show-status` to `#voice-satellite-ui` to display them. This does not affect conversation captions.
 
 ![Circular orb and conversation captions over a dashboard](docs/dashboard-preview.gif)
 

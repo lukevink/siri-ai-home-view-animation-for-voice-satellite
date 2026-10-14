@@ -55,7 +55,7 @@ test('no WebGL has a readable fallback', async ({ page }) => {
   await page.getByRole('button', {name:'Listen',exact:true}).click();
   await expect(page.locator('.siri-island')).toHaveAttribute('data-renderer','fallback');
   await expect(page.locator('.siri-island-fallback')).toBeVisible();
-  await expect(page.locator('.siri-island').getByRole('status')).toHaveText('Listening');
+  await expect(page.locator('.siri-island').getByRole('status', { includeHidden: true })).toHaveText('Listening');
 });
 
 test('reduced motion draws a still image and idle stops rendering', async ({ page }) => {
@@ -132,4 +132,16 @@ test('long spoken replies stay inside the rounded caption panel and remain scrol
   expect(layout.overflow).toBe(true);
   expect(layout.weight).toBe('300');
   expect(layout.color).toBe('rgb(255, 255, 255)');
+});
+
+test('status labels are hidden unless their opt-in class is present', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Listen', exact: true }).click();
+  const label = page.locator('.siri-island-label');
+  await expect(label).toBeHidden();
+  await page.getByLabel('Show status label').check();
+  await expect(label).toBeVisible();
+  await expect(label).toHaveText('Listening');
+  await page.getByLabel('Show status label').uncheck();
+  await expect(label).toBeHidden();
 });

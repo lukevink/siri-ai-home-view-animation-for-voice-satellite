@@ -2,6 +2,10 @@
 
 ## 0.2.7
 
+- Hide status labels unless the UI has the `siri-island-show-status` class.
+
+- Scale the bulge, neck, and default resting gap with the orb diameter.
+
 - Start the orb as a narrow tapered droplet, widening around neck separation.
 - Coordinate the droplet tip, neck pinch-off, and immediate bezel retraction.
 

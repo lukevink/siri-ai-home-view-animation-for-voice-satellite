@@ -54,3 +54,6 @@ document.querySelectorAll('.toggle').forEach(b => b.addEventListener('click', ()
 document.querySelectorAll('nav a').forEach(a => a.addEventListener('click', () => { document.querySelector('nav a.selected')?.classList.remove('selected'); a.classList.add('selected'); }));
 // Only the demo has a test/preview controller. The shipped module has none.
 window.demo = { setState, get state() { return activeState; } };
+
+document.getElementById('show-status').addEventListener('change', e =>
+  document.getElementById('voice-satellite-ui').classList.toggle('siri-island-show-status', e.target.checked));

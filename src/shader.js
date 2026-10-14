@@ -177,38 +177,40 @@ export const fragmentShader = `
                 // The drop lengthens first; its width catches up as it detaches.
                 float release = 0.46;
                 float fall = smoothstep(0.02, 0.84, u_drop);
-                float expand = smoothstep(0.08, 0.84, u_drop);
+                float expand = smoothstep(0.08, 0.74, u_drop);
                 float widen = smoothstep(0.30, 0.82, u_drop);
                 float grow = mix(0.28, 1.0, expand);
                 float stretch = mix(1.12, 1.0, widen);
-                float topEdge = mix(-18.0, u_top + 5.0, fall);
+                // Proportions are relative to the orb radius, not fixed screen pixels.
+                float pullLength = currentH * 0.45 * sin(smoothstep(0.0, 0.84, u_drop) * PI);
+                float topEdge = mix(-currentH * 0.42, u_top, fall) + pullLength;
                 float bounce = sin(smoothstep(0.52, 1.0, u_drop) * PI) * 5.5;
                 float centerY = topEdge + currentH * grow * stretch + bounce;
                 vec2 p = uv - vec2(72.0, centerY);
                 p /= grow;
                 p.y /= stretch;
                 // A narrow pear-shaped drop rounds out without a scale bounce.
-                p.x /= mix(0.48, 1.0, widen) *
+                p.x /= mix(0.55, 1.0, widen) *
                     (1.0 - 0.32 * (1.0 - widen) * smoothstep(0.0, 30.0, -p.y));
                 float dOrb = getIslandSDF(p, u_progress) * grow;
                 float birth = smoothstep(0.0, 0.12, u_drop);
                 float pull = smoothstep(0.10, release, u_drop);
                 float pinch = 1.0 - smoothstep(0.30, release, u_drop);
                 float retract = 1.0 - smoothstep(release, 0.62, u_drop);
-                float narrow = mix(1.0, 0.34, pull);
-                float lipWidth = max(0.01, 47.0 * u_bulgeWidth * narrow * birth * retract);
+                float narrow = mix(1.0, 0.55, pull);
+                float lipWidth = max(0.01, currentH * 1.10 * u_bulgeWidth * narrow * birth * retract);
                 // Follow the moving droplet tip so the two surfaces meet.
-                float lipDepth = max(0.01, mix(6.0, max(6.0, topEdge + 2.0),
+                float lipDepth = max(0.01, mix(currentH * 0.14, max(currentH * 0.14, topEdge + currentH * 0.047),
                     pull) * u_bulgeStretch * birth * retract);
                 float shoulder = max(0.0, 1.0 - pow((uv.x - 72.0) / lipWidth, 2.0));
                 float dLip = uv.y - lipDepth * shoulder * shoulder;
                 float neckEnd = max(centerY, 1.0);
                 float along = clamp(uv.y / neckEnd, 0.0, 1.0);
-                float neckWidth = (2.5 + 40.0 * u_bulgeWidth * narrow *
+                float neckWidth = (currentH * 0.058 + currentH * 0.93 * u_bulgeWidth * narrow *
                     pow(1.0 - along, 2.8)) * pinch * birth;
                 float dNeck = max(abs(uv.x - 72.0) - neckWidth, uv.y - neckEnd);
                 float surface = pinch > 0.001 ? min(dNeck, dLip) : dLip;
-                float joined = smoothUnion(dOrb, surface, max(0.001, 7.0 * pinch));
+                float joined = smoothUnion(dOrb, surface, max(0.001, currentH * 0.163 * pinch));
                 float dIsland = u_drop < 0.62 ? joined : dOrb;
 
                 float afwidth = length(vec2(dFdx(dIsland), dFdy(dIsland))) * 0.7071;
