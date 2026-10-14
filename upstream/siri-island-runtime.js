@@ -24,7 +24,7 @@ SOFTWARE.
 */
 
 // src/island.css
-var island_default = '/* Scoped to the opt-in host: other Voice Satellite skins stay untouched. */\n#voice-satellite-ui.siri-island-enabled .vs-rainbow-bar,\n#voice-satellite-ui.siri-island-enabled .vs-rainbow-bar::before,\n#voice-satellite-ui.siri-island-enabled .vs-rainbow-bar::after {\n  opacity: 0 !important;\n  animation: none !important;\n  filter: none !important;\n  pointer-events: none !important;\n}\n#voice-satellite-ui.siri-island-enabled .vs-blur-overlay {\n  backdrop-filter: blur(var(--siri-island-backdrop-blur, 2px));\n  -webkit-backdrop-filter: blur(var(--siri-island-backdrop-blur, 2px));\n}\n#voice-satellite-ui .siri-island {\n  position: fixed;\n  top: 0;\n  --siri-island-offset: max(0px, calc(env(safe-area-inset-top, 0px) + var(--siri-island-top, 20px)));\n  left: 50%;\n  --siri-island-size: min(var(--siri-island-width, 240px), 80vw);\n  width: var(--siri-island-size);\n  transform: translateX(-50%);\n  z-index: 10002;\n  pointer-events: none;\n  opacity: 0;\n  visibility: hidden;\n  transition: opacity 180ms ease, visibility 180ms;\n  contain: layout style;\n}\n#voice-satellite-ui .siri-island[data-visible="true"] { opacity: 1; visibility: visible; }\n#voice-satellite-ui .siri-island canvas { width: 100%; height: calc(var(--siri-island-size) * 112 / 144 + var(--siri-island-offset)); display: block; }\n#voice-satellite-ui .siri-island-label {\n  display: block;\n  color: var(--siri-island-label-color, #f3f4fb);\n  background: rgba(12, 15, 24, 0.82);\n  border: 1px solid rgba(255,255,255,.1);\n  border-radius: 30px;\n  padding: 6px 14px;\n  width: max-content;\n  max-width: 100%;\n  box-sizing: border-box;\n  margin: -5px auto 0;\n  text-align: center;\n  font: 500 12px/1.3 system-ui, sans-serif;\n  letter-spacing: .02em;\n}\n#voice-satellite-ui .siri-island-fallback {\n  display: none;\n  height: 132px;\n  margin: 24px 12%;\n  border-radius: 42%;\n  border: 1px solid #8a8eaa;\n  background: radial-gradient(ellipse at 50% 95%, #fff9, transparent 30%), linear-gradient(#000f 10%, #0002 75%);\n  box-shadow: inset 0 -2px 4px #cdd9e5, 0 16px 35px #0004;\n  align-items: center;\n  justify-content: center;\n  gap: 6px;\n}\n#voice-satellite-ui .siri-island-fallback i {\n  width: 15px; height: 22px; border-radius: 50%;\n  background: #005fff; box-shadow: 0 0 18px currentColor;\n}\n#voice-satellite-ui .siri-island-fallback i:nth-child(2) { background: #00ffde; height: 36px; }\n#voice-satellite-ui .siri-island-fallback i:nth-child(3) { background: #fa1f1f; height: 30px; }\n#voice-satellite-ui .siri-island-fallback i:nth-child(4) { background: #ff930d; height: 18px; }\n#voice-satellite-ui .siri-island[data-renderer="fallback"] canvas { display: none; }\n#voice-satellite-ui .siri-island[data-renderer="fallback"] .siri-island-fallback { display: flex; }\n@media (max-height: 540px) {\n  #voice-satellite-ui .siri-island { --siri-island-size: min(var(--siri-island-width, 170px), 40vw); }\n}\n@media (prefers-reduced-motion: reduce) {\n  #voice-satellite-ui .siri-island { transition: none; }\n}\n\n#voice-satellite-ui .siri-island[data-shape="circle"] .siri-island-fallback {\n  aspect-ratio: 1; height: auto; border-radius: 50%; margin: var(--siri-island-offset) 20% 16px;\n}\n\n#voice-satellite-ui .siri-island-refraction {\n  position: absolute;\n  left: calc(50% - var(--siri-island-size) * 53 / 144);\n  top: calc(var(--siri-island-offset) + var(--siri-island-size) * 5 / 144);\n  width: calc(var(--siri-island-size) * 106 / 144);\n  height: calc(var(--siri-island-size) * 82 / 144);\n  border-radius: 44%;\n  visibility: hidden;\n  pointer-events: none;\n}\n#voice-satellite-ui .siri-island[data-shape="circle"] .siri-island-refraction {\n  left: calc(50% - var(--siri-island-size) * 43 / 144);\n  width: calc(var(--siri-island-size) * 86 / 144);\n  height: calc(var(--siri-island-size) * 86 / 144);\n  border-radius: 50%;\n}\n#voice-satellite-ui .siri-island canvas { position: relative; }\n';
+var island_default = '/* Scoped to the opt-in host: other Voice Satellite skins stay untouched. */\n#voice-satellite-ui.siri-island-enabled .vs-rainbow-bar,\n#voice-satellite-ui.siri-island-enabled .vs-rainbow-bar::before,\n#voice-satellite-ui.siri-island-enabled .vs-rainbow-bar::after {\n  opacity: 0 !important;\n  animation: none !important;\n  filter: none !important;\n  pointer-events: none !important;\n}\n#voice-satellite-ui.siri-island-enabled .vs-blur-overlay {\n  backdrop-filter: blur(var(--siri-island-backdrop-blur, 2px));\n  -webkit-backdrop-filter: blur(var(--siri-island-backdrop-blur, 2px));\n}\n#voice-satellite-ui .siri-island {\n  position: fixed;\n  top: 0;\n  --siri-island-offset: max(0px, calc(env(safe-area-inset-top, 0px) + var(--siri-island-top, 20px)));\n  left: 50%;\n  --siri-island-size: min(var(--siri-island-width, 240px), 80vw);\n  width: var(--siri-island-size);\n  transform: translateX(-50%);\n  z-index: 10002;\n  pointer-events: none;\n  opacity: 0;\n  visibility: hidden;\n  transition: opacity 180ms ease, visibility 180ms;\n  contain: layout style;\n}\n#voice-satellite-ui .siri-island[data-visible="true"] { opacity: 1; visibility: visible; }\n#voice-satellite-ui .siri-island canvas { width: 100%; height: calc(var(--siri-island-size) * 112 / 144 + var(--siri-island-offset)); display: block; }\n#voice-satellite-ui .siri-island-label {\n  display: block;\n  color: var(--siri-island-label-color, #f3f4fb);\n  background: rgba(12, 15, 24, 0.82);\n  border: 1px solid rgba(255,255,255,.1);\n  border-radius: 30px;\n  padding: 6px 14px;\n  width: max-content;\n  max-width: 100%;\n  box-sizing: border-box;\n  margin: -5px auto 0;\n  text-align: center;\n  font: 500 12px/1.3 system-ui, sans-serif;\n  letter-spacing: .02em;\n}\n#voice-satellite-ui .siri-island[data-state="idle"] .siri-island-label { visibility: hidden; }\n#voice-satellite-ui .siri-island-fallback {\n  display: none;\n  height: 132px;\n  margin: 24px 12%;\n  border-radius: 42%;\n  border: 1px solid #8a8eaa;\n  background: radial-gradient(ellipse at 50% 95%, #fff9, transparent 30%), linear-gradient(#000f 10%, #0002 75%);\n  box-shadow: inset 0 -2px 4px #cdd9e5, 0 16px 35px #0004;\n  align-items: center;\n  justify-content: center;\n  gap: 6px;\n}\n#voice-satellite-ui .siri-island-fallback i {\n  width: 15px; height: 22px; border-radius: 50%;\n  background: #005fff; box-shadow: 0 0 18px currentColor;\n}\n#voice-satellite-ui .siri-island-fallback i:nth-child(2) { background: #00ffde; height: 36px; }\n#voice-satellite-ui .siri-island-fallback i:nth-child(3) { background: #fa1f1f; height: 30px; }\n#voice-satellite-ui .siri-island-fallback i:nth-child(4) { background: #ff930d; height: 18px; }\n#voice-satellite-ui .siri-island[data-renderer="fallback"] canvas { display: none; }\n#voice-satellite-ui .siri-island[data-renderer="fallback"] .siri-island-fallback { display: flex; }\n@media (max-height: 540px) {\n  #voice-satellite-ui .siri-island { --siri-island-size: min(var(--siri-island-width, 170px), 40vw); }\n}\n@media (prefers-reduced-motion: reduce) {\n  #voice-satellite-ui .siri-island { transition: none; }\n}\n\n#voice-satellite-ui .siri-island[data-shape="circle"] .siri-island-fallback {\n  aspect-ratio: 1; height: auto; border-radius: 50%; margin: var(--siri-island-offset) 20% 16px;\n}\n\n#voice-satellite-ui .siri-island-refraction {\n  position: absolute;\n  left: calc(50% - var(--siri-island-size) * 53 / 144);\n  top: calc(var(--siri-island-offset) + var(--siri-island-size) * 5 / 144);\n  width: calc(var(--siri-island-size) * 106 / 144);\n  height: calc(var(--siri-island-size) * 82 / 144);\n  border-radius: 44%;\n  visibility: hidden;\n  pointer-events: none;\n}\n#voice-satellite-ui .siri-island[data-shape="circle"] .siri-island-refraction {\n  left: calc(50% - var(--siri-island-size) * 43 / 144);\n  width: calc(var(--siri-island-size) * 86 / 144);\n  height: calc(var(--siri-island-size) * 86 / 144);\n  border-radius: 50%;\n}\n#voice-satellite-ui .siri-island canvas { position: relative; }\n';
 
 // src/shader.js
 var fragmentShader = `
@@ -210,13 +210,14 @@ var fragmentShader = `
             }
 
             void main() {
+                if (u_drop <= 0.0) { gl_FragColor = vec4(0.0); return; }
                 vec2 uv = vec2(vUv.x, 1.0 - vUv.y) * u_resolution;
                 float currentH = mix(41.0, 43.0, u_circle);
                 // Extrude, pinch off, then settle: one continuous surface at the bezel.
                 float travel = smoothstep(0.0, 0.78, u_drop);
                 float settle = sin((u_drop - 0.78) * 18.0) *
                     (1.0 - smoothstep(0.78, 1.0, u_drop)) * 3.0 * step(0.78, u_drop);
-                float centerY = mix(-14.0, u_top + currentH + 5.0, travel) + settle;
+                float centerY = mix(-22.0, u_top + currentH + 5.0, travel) + settle;
                 float grow = mix(0.32, 1.0, smoothstep(0.08, 0.85, u_drop));
                 vec2 p = uv - vec2(72.0, centerY);
                 p /= grow;
@@ -224,13 +225,22 @@ var fragmentShader = `
                 float dOrb = getIslandSDF(p, u_progress) * grow;
                 float neckEnd = max(centerY, 1.0);
                 float along = clamp(uv.y / neckEnd, 0.0, 1.0);
-                float pinch = 1.0 - smoothstep(0.32, 0.62, u_drop);
-                float neckWidth = (3.0 + 30.0 * pow(1.0 - along, 3.0)) * pinch;
+                float pinch = 1.0 - smoothstep(0.38, 0.72, u_drop);
+                float birth = smoothstep(0.0, 0.16, u_drop);
+                float neckWidth = (5.0 + 53.0 * pow(1.0 - along, 2.6)) * pinch * birth;
                 float dNeck = max(abs(uv.x - 72.0) - neckWidth, uv.y - neckEnd);
+                // A broad, shallow pool grows directly out of the screen edge.
+                // Its curved shoulders narrow into the stretching neck, then
+                // retract after pinch-off. Reversing u_drop rejoins that pool.
+                float lipWidth = max(0.01, 69.0 * birth * pinch);
+                float lipDepth = max(0.01, 15.0 * birth * pinch);
+                float shoulder = max(0.0, 1.0 - pow((uv.x - 72.0) / lipWidth, 2.0));
+                float dLip = uv.y - lipDepth * shoulder * shoulder;
+                dNeck = min(dNeck, dLip);
                 float join = 10.0 * pinch;
                 float blend = max(join - abs(dOrb - dNeck), 0.0) / max(join, 0.001);
                 float joined = min(dOrb, dNeck) - blend * blend * join * 0.25;
-                float dIsland = u_drop < 0.62 ? joined : dOrb;
+                float dIsland = u_drop < 0.72 ? joined : dOrb;
 
                 float afwidth = length(vec2(dFdx(dIsland), dFdy(dIsland))) * 0.7071;
                 float edgeIsland = (1.0 - smoothstep(-afwidth, afwidth, dIsland));
@@ -375,8 +385,9 @@ var fragmentShader = `
                 float alpha = max(bodyAlpha, lightAlpha);
                 // The neck is pure black; illumination belongs to the detached glass.
                 float orbMask = 1.0 - smoothstep(-1.0, 1.0, dOrb);
-                vec3 color = clamp((glassBody + lights) / max(alpha, 0.001), 0.0, 1.0) * orbMask;
-                alpha = mix(1.0, alpha, orbMask);
+                float glassReveal = smoothstep(0.28, 0.8, u_drop);
+                vec3 color = clamp((glassBody + lights) / max(alpha, 0.001), 0.0, 1.0) * orbMask * glassReveal;
+                alpha = mix(1.0, alpha, orbMask * glassReveal);
                 gl_FragColor = vec4(color, edgeIsland * alpha);
             }
         `;
@@ -566,8 +577,9 @@ var IslandRenderer = class {
   }
   render(delta, { state, level, reducedMotion = false, circle = false, opacity = 0.14, bottomGlow = 0.8, entrance = true, elapsed = delta }) {
     const active = state !== "idle";
-    this.spring.target = active ? 1 : 0;
-    this.drop = Math.min(1, this.drop + elapsed / 0.95);
+    const liquidMotion = !reducedMotion && entrance;
+    this.drop = Math.max(0, Math.min(1, this.drop + (active ? 1 : -1) * elapsed / (active ? 0.95 : 0.8)));
+    this.spring.target = active || liquidMotion && this.drop > 0 ? 1 : 0;
     this.thinking += (Number(state === "processing") - this.thinking) * (1 - Math.exp(-delta * 8));
     this.float("u_drop", reducedMotion || !entrance ? 1 : this.drop);
     this.float("u_circle", Number(circle));
@@ -590,7 +602,7 @@ var IslandRenderer = class {
     this.float("yScale", reducedMotion ? 0.11 : state === "processing" ? 0.065 : 0.085 + this.level * 0.13);
     this.float("glowIntensity", 1.15 + (reducedMotion ? 0 : this.level * 0.25));
     this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
-    return active || progress > 2e-3 || Math.abs(this.spring.velocity) > 2e-3;
+    return liquidMotion ? active || this.drop > 0 : active || progress > 2e-3 || Math.abs(this.spring.velocity) > 2e-3;
   }
   dispose() {
     const gl = this.gl;
@@ -728,7 +740,7 @@ var Island = class {
     }
     if (next !== "idle") {
       this.initRenderer();
-      if (wasIdle) this.renderer?.reset();
+      if (wasIdle && this.el.dataset.visible !== "true") this.renderer?.reset();
       this.el.dataset.visible = "true";
       this.start();
     } else if (this.motion.matches || this.failed) {

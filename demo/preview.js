@@ -37,7 +37,7 @@ function appearance() {
 for (const id of ['enabled', 'shape', 'opacity']) document.getElementById(id).addEventListener('input', appearance);
 document.getElementById('light-backdrop').addEventListener('change', e => document.body.classList.toggle('light-backdrop', e.target.checked));
 document.getElementById('drop-preview').addEventListener('click', () => {
-  cancelSequence(); setState('idle'); timers.push(setTimeout(() => setState('listening'), 650));
+  cancelSequence(); setState('idle'); timers.push(setTimeout(() => setState('listening'), 1000));
 });
 document.querySelectorAll('.toggle').forEach(b => b.addEventListener('click', () => { const on=b.getAttribute('aria-pressed') !== 'true'; b.setAttribute('aria-pressed', String(on)); b.classList.toggle('off', !on); }));
 document.querySelectorAll('nav a').forEach(a => a.addEventListener('click', () => { document.querySelector('nav a.selected')?.classList.remove('selected'); a.classList.add('selected'); }));

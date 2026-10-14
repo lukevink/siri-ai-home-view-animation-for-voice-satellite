@@ -1,14 +1,14 @@
 # Siri AI Home View Animation for Voice Satellite
 
-A liquid drop from the top bezel that settles into a transparent glass orb or rounded island, with audio-reactive Siri-style waves for [Voice Satellite for Home Assistant](https://github.com/jxlarrea/voice-satellite-card-integration). It opens when Voice Satellite starts a voice interaction, changes with listening / thinking / speaking, and disappears when the interaction ends.
+A liquid drop from the top bezel that settles into a transparent glass orb or rounded island, with audio-reactive Siri-style waves for [Voice Satellite for Home Assistant](https://github.com/jxlarrea/voice-satellite-card-integration). It opens when Voice Satellite starts a voice interaction, changes with listening / thinking / speaking, and flows back into the bezel when the interaction ends.
 
 **The original animation is by [Neel Dedkawala](https://github.com/neeldedkawala).** This project adapts the shader and spring animation from his MIT-licensed **[iOS Siri Animation](https://github.com/neeldedkawala/ios-siri-animation)**. Please visit and credit the original project. The Home Assistant bridge, packaging, and audio-reactive adaptation are additions here.
 
 ![Home View orb with transparent glass over the demo dashboard](docs/home-view-preview.png)
 
-Version 0.2 adds a liquid bezel entrance, a circular orb option, transparent glass with a white lower glow, and fluid thinking dots. Run the local preview below to compare both shapes and light/dark backgrounds.
+Version 0.2 adds a liquid bezel entrance and return, a circular orb option, transparent glass with a white lower glow, and fluid thinking dots. Run the local preview below to compare both shapes and light/dark backgrounds.
 
-**Status: experimental 0.2.0.** The existing adapter has been used with Home Assistant and Android Kiosk Satellite. The new visuals are validated in the local preview and browser compatibility checks; physical-device performance of this version still needs verification. This is an independent community extension, not an official Voice Satellite or Apple product.
+**Status: experimental 0.2.1.** The skin has been used with Home Assistant and Android Kiosk Satellite. The bezel return is checked in the local preview and browser compatibility tests. Browser support and device performance can vary. This is an independent community extension, not an official Voice Satellite or Apple product.
 
 ## What you install
 
@@ -80,7 +80,7 @@ Merge this into an existing `frontend:` section rather than creating a duplicate
 ## Manual installation
 
 1. Copy [`dist/siri-island.js`](dist/siri-island.js) to `/config/www/siri-island.js` on your Home Assistant server.
-2. Add `/local/siri-island.js?v=0.2.0` as a JavaScript module under Dashboard Resources, or use that URL under `frontend.extra_module_url` above.
+2. Add `/local/siri-island.js?v=0.2.1` as a JavaScript module under Dashboard Resources, or use that URL under `frontend.extra_module_url` above.
 3. Follow steps 5–7 from the HACS instructions.
 
 No Python component, card YAML, or access token is required. Keep the copyright/license banner in the distributed JavaScript file intact.
@@ -97,7 +97,7 @@ The `--siri-island-*` CSS names and `siri-island.js` filename remain compatible 
 | `--siri-island-glass-opacity` | `0.14` | Lower glass opacity from `0` to `1`; the upper cap stays dark. |
 | `--siri-island-bottom-glow` | `0.8` | White lower glow strength from `0` to `2`. |
 | `--siri-island-refraction` | `18` | Live backdrop displacement strength from `0` to `40` pixels; `0` disables it. |
-| `--siri-island-entrance` | `drop` | Set `none` to disable the falling entrance. Reduced-motion users also skip it. |
+| `--siri-island-entrance` | `drop` | Set `none` to disable the liquid entrance and return. Reduced-motion users also skip it. |
 | `--siri-island-backdrop-blur` | `2px` | Blur applied to Voice Satellite's full-screen backdrop. |
 
 The lower glass is genuinely transparent to the dashboard. A separate SVG backdrop displacement layer bends the actual dashboard behind the settled orb in browsers that support SVG backdrop filters (verified in Chromium). The WebGL shader adds the illuminated rim and subtle studio reflections. Safari and other browsers without SVG backdrop-filter support retain the transparent glass without live distortion. This is a browser approximation, not Apple’s system compositor. No DOM screenshot capture or additional network requests are involved. Fluid dots are an original lightweight smooth-union shader inspired by [40973894's Siri Wave / Fluid Dots](https://21st.dev/@40973894/components/siri-wave/fluid-dots); no React dependency or code from that component is bundled.

@@ -7,7 +7,7 @@ await build({
   entryPoints: ['src/index.js'], outfile: 'dist/siri-island.js', bundle: true,
   format: 'esm', target: ['safari15', 'chrome100', 'firefox100'], minify: true,
   loader: { '.css': 'text' },
-  banner: { js: `/*! Siri AI Home View Animation for Voice Satellite 0.2.0 — AGPL-3.0-only.\n * Source: https://github.com/lukevink/siri-ai-home-view-animation-for-voice-satellite\n * Shader adapted from neeldedkawala/ios-siri-animation (MIT).\n${notice}\n*/` },
+  banner: { js: `/*! Siri AI Home View Animation for Voice Satellite 0.2.1 — AGPL-3.0-only.\n * Source: https://github.com/lukevink/siri-ai-home-view-animation-for-voice-satellite\n * Shader adapted from neeldedkawala/ios-siri-animation (MIT).\n${notice}\n*/` },
 });
 // This native adapter can be copied into an upstream Voice Satellite checkout.
 await build({
