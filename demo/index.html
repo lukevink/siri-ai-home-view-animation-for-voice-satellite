@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Siri Island · Voice Satellite</title>
+  <link rel="stylesheet" href="/tests/fixtures/voice-satellite-siri.css" id="fixture-style">
+  <link rel="stylesheet" href="/demo/preview.css">
+  <style id="voice-satellite-custom-css">
+    #voice-satellite-ui { --siri-island-enabled: 1; --siri-island-width: 260px; }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <aside><a class="brand" href="#home"><span class="brand-mark">⌂</span> home</a><nav><a href="#home" class="selected">Overview</a><a href="#rooms">Rooms</a><a href="#energy">Energy</a></nav><div class="aside-foot"><span class="online"></span> All systems online</div></aside>
+    <main>
+      <header><span class="eyebrow">YOUR SPACE, CONNECTED</span><span class="date">Wednesday, October 14</span></header>
+      <div class="heading"><div><h1>Good evening.</h1><p>A little quieter. A little warmer. Welcome home.</p></div><div class="weather"><span>☀</span><strong>18°</strong><small>Clear skies</small></div></div>
+      <div class="status-row"><span><i class="online"></i> Home is secure</span><span>Indoor <b>21.5°</b></span><span>Lights on <b>4</b></span></div>
+      <section class="rooms" aria-label="Example dashboard">
+        <article class="room living"><div class="room-top"><span class="room-icon">◒</span><span class="room-temp">21.5°</span></div><div><small>YOUR EVENING SPACE</small><h2>Living room</h2><p>Warm light · 65%</p></div><div class="room-bottom"><span>● &nbsp; 2 lights on</span><button aria-label="Toggle living room" class="toggle" aria-pressed="true"></button></div></article>
+        <article class="room kitchen"><div class="room-top"><span class="room-icon">◫</span><span class="room-temp">22.0°</span></div><div><small>READY WHEN YOU ARE</small><h2>Kitchen</h2><p>Pendant lights · 80%</p></div><div class="room-bottom"><span>● &nbsp; 2 lights on</span><button aria-label="Toggle kitchen" class="toggle" aria-pressed="true"></button></div></article>
+        <article class="room bedroom"><div class="room-top"><span class="room-icon">☾</span><span class="room-temp">19.0°</span></div><div><small>REST COMES NATURALLY</small><h2>Bedroom</h2><p>Lights off · Blinds closed</p></div><div class="room-bottom"><span>○ &nbsp; Everything off</span><button aria-label="Toggle bedroom" class="toggle off" aria-pressed="false"></button></div></article>
+      </section>
+      <div class="lower"><section class="scene-panel"><div class="section-title"><h2>Set the mood</h2><small>SCENES</small></div><div class="scenes"><button>◐ <span>Wind down</span></button><button>▷ <span>Movie night</span></button><button>☾ <span>Good night</span></button></div></section><section class="energy-panel"><small>TODAY'S ENERGY</small><strong>4.8 <span>kWh</span></strong><p>↓ 12% less than yesterday</p><div class="bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></section></div>
+      <footer>Example dashboard · controls do not operate real devices</footer>
+    </main>
+  </div>
+  <div id="voice-satellite-ui">
+    <div class="vs-blur-overlay" style="background:rgba(5,7,14,.22)"></div>
+    <div class="vs-chat-container"><div class="vs-chat-msg user">Turn on the living room lights.</div><div class="vs-chat-msg assistant">The living room lights are on.</div></div>
+    <div class="vs-rainbow-bar"><div class="vs-bar-glow"></div><div class="vs-bar-fill"></div></div>
+  </div>
+  <section class="demo-controls" aria-label="Animation preview controls">
+    <div class="control-title"><span>SIRI ISLAND <b>for Voice Satellite</b></span><span class="demo-badge">SIMULATED AUDIO</span></div>
+    <div class="control-buttons"><button data-state="listening">Listen</button><button data-state="processing">Think</button><button data-state="speaking">Speak</button><button data-state="idle">Finish</button><button id="sequence">▶ Play sequence</button></div>
+    <div class="audio-control"><label for="level">Voice level</label><input id="level" type="range" min="0" max="1" step="0.01" value="0.55"><output id="level-output">55%</output><label class="checkbox"><input type="checkbox" id="enabled" checked> Island skin</label></div>
+    <p>Animation adapted from <a href="https://github.com/neeldedkawala/ios-siri-animation" target="_blank" rel="noreferrer">Neel Dedkawala’s iOS Siri Animation</a> · MIT</p>
+  </section>
+  <script type="module" src="/dist/siri-island.js"></script>
+  <script type="module" src="/demo/preview.js"></script>
+</body>
+</html>

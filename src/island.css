@@ -1,0 +1,70 @@
+/* Scoped to the opt-in host: other Voice Satellite skins stay untouched. */
+#voice-satellite-ui.siri-island-enabled .vs-rainbow-bar,
+#voice-satellite-ui.siri-island-enabled .vs-rainbow-bar::before,
+#voice-satellite-ui.siri-island-enabled .vs-rainbow-bar::after {
+  opacity: 0 !important;
+  animation: none !important;
+  filter: none !important;
+  pointer-events: none !important;
+}
+#voice-satellite-ui.siri-island-enabled .vs-blur-overlay {
+  backdrop-filter: blur(var(--siri-island-backdrop-blur, 2px));
+  -webkit-backdrop-filter: blur(var(--siri-island-backdrop-blur, 2px));
+}
+#voice-satellite-ui .siri-island {
+  position: fixed;
+  top: calc(env(safe-area-inset-top, 0px) + var(--siri-island-top, 20px));
+  left: 50%;
+  width: min(var(--siri-island-width, 240px), 80vw);
+  transform: translateX(-50%);
+  z-index: 10002;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 180ms ease, visibility 180ms;
+  contain: layout style;
+}
+#voice-satellite-ui .siri-island[data-visible="true"] { opacity: 1; visibility: visible; }
+#voice-satellite-ui .siri-island canvas { width: 100%; aspect-ratio: 144 / 112; display: block; }
+#voice-satellite-ui .siri-island-label {
+  display: block;
+  color: var(--siri-island-label-color, #f3f4fb);
+  background: rgba(12, 15, 24, 0.82);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 30px;
+  padding: 6px 14px;
+  width: max-content;
+  max-width: 100%;
+  box-sizing: border-box;
+  margin: -5px auto 0;
+  text-align: center;
+  font: 500 12px/1.3 system-ui, sans-serif;
+  letter-spacing: .02em;
+}
+#voice-satellite-ui .siri-island-fallback {
+  display: none;
+  height: 132px;
+  margin: 24px 12%;
+  border-radius: 42%;
+  border: 1px solid #8a8eaa;
+  background: radial-gradient(ellipse at 55% 60%, #47475e, #080912 70%);
+  box-shadow: inset 0 -2px 4px #cdd9e5, 0 16px 35px #0004;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+#voice-satellite-ui .siri-island-fallback i {
+  width: 15px; height: 22px; border-radius: 50%;
+  background: #005fff; box-shadow: 0 0 18px currentColor;
+}
+#voice-satellite-ui .siri-island-fallback i:nth-child(2) { background: #00ffde; height: 36px; }
+#voice-satellite-ui .siri-island-fallback i:nth-child(3) { background: #fa1f1f; height: 30px; }
+#voice-satellite-ui .siri-island-fallback i:nth-child(4) { background: #ff930d; height: 18px; }
+#voice-satellite-ui .siri-island[data-renderer="fallback"] canvas { display: none; }
+#voice-satellite-ui .siri-island[data-renderer="fallback"] .siri-island-fallback { display: flex; }
+@media (max-height: 540px) {
+  #voice-satellite-ui .siri-island { width: min(var(--siri-island-width, 170px), 40vw); }
+}
+@media (prefers-reduced-motion: reduce) {
+  #voice-satellite-ui .siri-island { transition: none; }
+}
