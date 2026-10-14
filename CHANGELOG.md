@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.4
+
+- Expand the conversation caption panel across the screen with matching side and bottom margins.
+
 ## 0.2.3
 
 - Six thinking dots now follow a circular orbit with equal horizontal and vertical radius.

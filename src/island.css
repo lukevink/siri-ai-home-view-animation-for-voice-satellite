@@ -37,12 +37,14 @@
   scrollbar-color: #ffffff45 transparent;
 }
 #voice-satellite-ui.siri-island-enabled .vs-chat-container:not(.announcement-mode) {
-  left: 16px;
-  right: 16px;
+  --siri-caption-inset: max(24px, env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px), env(safe-area-inset-bottom, 0px));
+  left: var(--siri-caption-inset);
+  right: var(--siri-caption-inset);
   width: auto;
-  max-width: 900px;
+  max-width: none;
+  box-sizing: border-box;
   margin-inline: auto;
-  bottom: max(24px, env(safe-area-inset-bottom, 0px)) !important;
+  bottom: var(--siri-caption-inset) !important;
 }
 #voice-satellite-ui.siri-island-enabled .vs-chat-msg.assistant {
   max-height: none;
