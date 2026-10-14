@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.11
+
+- Round the connected liquid shoulder to remove the pinched neck and angular transition into the droplet.
+
 ## 0.2.10
 
 - Recoil the detached bezel bulge rapidly into a wide, shallow shoulder before settling flat.
