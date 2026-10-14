@@ -3,14 +3,15 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <title>Siri Island · Voice Satellite</title>
+  <title>Siri AI Home View Animation for Voice Satellite</title>
   <link rel="stylesheet" href="/tests/fixtures/voice-satellite-siri.css" id="fixture-style">
   <link rel="stylesheet" href="/demo/preview.css">
   <style id="voice-satellite-custom-css">
-    #voice-satellite-ui { --siri-island-enabled: 1; --siri-island-width: 260px; }
+    #voice-satellite-ui { --siri-island-enabled: 1; --siri-island-width: 260px; --siri-island-shape: circle; }
   </style>
 </head>
 <body>
+  <div class="glass-test-pattern" aria-hidden="true">HOME VIEW · LIQUID GLASS<br>0123456789 · REFRACTION</div>
   <div class="shell">
     <aside><a class="brand" href="#home"><span class="brand-mark">⌂</span> home</a><nav><a href="#home" class="selected">Overview</a><a href="#rooms">Rooms</a><a href="#energy">Energy</a></nav><div class="aside-foot"><span class="online"></span> All systems online</div></aside>
     <main>
@@ -32,9 +33,10 @@
     <div class="vs-rainbow-bar"><div class="vs-bar-glow"></div><div class="vs-bar-fill"></div></div>
   </div>
   <section class="demo-controls" aria-label="Animation preview controls">
-    <div class="control-title"><span>SIRI ISLAND <b>for Voice Satellite</b></span><span class="demo-badge">SIMULATED AUDIO</span></div>
+    <div class="control-title"><span>SIRI AI HOME VIEW <b>for Voice Satellite</b></span><span class="demo-badge">SIMULATED AUDIO</span></div>
     <div class="control-buttons"><button data-state="listening">Listen</button><button data-state="processing">Think</button><button data-state="speaking">Speak</button><button data-state="idle">Finish</button><button id="sequence">▶ Play sequence</button></div>
-    <div class="audio-control"><label for="level">Voice level</label><input id="level" type="range" min="0" max="1" step="0.01" value="0.55"><output id="level-output">55%</output><label class="checkbox"><input type="checkbox" id="enabled" checked> Island skin</label></div>
+    <div class="appearance-control"><label>Shape <select id="shape"><option value="circle">Circle orb</option><option value="island">Rounded island</option></select></label><label>Glass opacity <input id="opacity" type="range" min="0" max="0.8" step="0.01" value="0.14"></label><label><input id="light-backdrop" type="checkbox"> Light backdrop</label><button id="drop-preview">Replay drop</button></div>
+    <div class="audio-control"><label for="level">Voice level</label><input id="level" type="range" min="0" max="1" step="0.01" value="0.55"><output id="level-output">55%</output><label class="checkbox"><input type="checkbox" id="enabled" checked> Enable skin</label></div>
     <p>Animation adapted from <a href="https://github.com/neeldedkawala/ios-siri-animation" target="_blank" rel="noreferrer">Neel Dedkawala’s iOS Siri Animation</a> · MIT</p>
   </section>
   <script type="module" src="/dist/siri-island.js"></script>

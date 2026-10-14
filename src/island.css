@@ -13,9 +13,11 @@
 }
 #voice-satellite-ui .siri-island {
   position: fixed;
-  top: calc(env(safe-area-inset-top, 0px) + var(--siri-island-top, 20px));
+  top: 0;
+  --siri-island-offset: max(0px, calc(env(safe-area-inset-top, 0px) + var(--siri-island-top, 20px)));
   left: 50%;
-  width: min(var(--siri-island-width, 240px), 80vw);
+  --siri-island-size: min(var(--siri-island-width, 240px), 80vw);
+  width: var(--siri-island-size);
   transform: translateX(-50%);
   z-index: 10002;
   pointer-events: none;
@@ -25,7 +27,7 @@
   contain: layout style;
 }
 #voice-satellite-ui .siri-island[data-visible="true"] { opacity: 1; visibility: visible; }
-#voice-satellite-ui .siri-island canvas { width: 100%; aspect-ratio: 144 / 112; display: block; }
+#voice-satellite-ui .siri-island canvas { width: 100%; height: calc(var(--siri-island-size) * 112 / 144 + var(--siri-island-offset)); display: block; }
 #voice-satellite-ui .siri-island-label {
   display: block;
   color: var(--siri-island-label-color, #f3f4fb);
@@ -47,7 +49,7 @@
   margin: 24px 12%;
   border-radius: 42%;
   border: 1px solid #8a8eaa;
-  background: radial-gradient(ellipse at 55% 60%, #47475e, #080912 70%);
+  background: radial-gradient(ellipse at 50% 95%, #fff9, transparent 30%), linear-gradient(#000f 10%, #0002 75%);
   box-shadow: inset 0 -2px 4px #cdd9e5, 0 16px 35px #0004;
   align-items: center;
   justify-content: center;
@@ -63,8 +65,30 @@
 #voice-satellite-ui .siri-island[data-renderer="fallback"] canvas { display: none; }
 #voice-satellite-ui .siri-island[data-renderer="fallback"] .siri-island-fallback { display: flex; }
 @media (max-height: 540px) {
-  #voice-satellite-ui .siri-island { width: min(var(--siri-island-width, 170px), 40vw); }
+  #voice-satellite-ui .siri-island { --siri-island-size: min(var(--siri-island-width, 170px), 40vw); }
 }
 @media (prefers-reduced-motion: reduce) {
   #voice-satellite-ui .siri-island { transition: none; }
 }
+
+#voice-satellite-ui .siri-island[data-shape="circle"] .siri-island-fallback {
+  aspect-ratio: 1; height: auto; border-radius: 50%; margin: var(--siri-island-offset) 20% 16px;
+}
+
+#voice-satellite-ui .siri-island-refraction {
+  position: absolute;
+  left: calc(50% - var(--siri-island-size) * 53 / 144);
+  top: calc(var(--siri-island-offset) + var(--siri-island-size) * 5 / 144);
+  width: calc(var(--siri-island-size) * 106 / 144);
+  height: calc(var(--siri-island-size) * 82 / 144);
+  border-radius: 44%;
+  visibility: hidden;
+  pointer-events: none;
+}
+#voice-satellite-ui .siri-island[data-shape="circle"] .siri-island-refraction {
+  left: calc(50% - var(--siri-island-size) * 43 / 144);
+  width: calc(var(--siri-island-size) * 86 / 144);
+  height: calc(var(--siri-island-size) * 86 / 144);
+  border-radius: 50%;
+}
+#voice-satellite-ui .siri-island canvas { position: relative; }
