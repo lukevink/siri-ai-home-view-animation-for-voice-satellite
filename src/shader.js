@@ -188,12 +188,12 @@ export const fragmentShader = `
                 p.x /= mix(0.70, 1.0, widen);
                 float dOrb = getIslandSDF(p, u_progress) * grow;
                 float birth = smoothstep(0.0, 0.12, u_drop);
-                float pull = smoothstep(0.08, 0.44, u_drop);
+                float pull = smoothstep(0.08, 0.28, u_drop);
                 // Once the drop clears, the stretched liquid recoils quickly
                 // into a broad shallow shoulder, then settles flush with the edge.
-                float reabsorb = smoothstep(0.44, 0.56, u_drop);
+                float reabsorb = smoothstep(0.28, 0.36, u_drop);
                 float retract = (1.0 - 0.82 * reabsorb) *
-                    (1.0 - smoothstep(0.56, 0.74, u_drop));
+                    (1.0 - smoothstep(0.36, 0.60, u_drop));
                 // Surface tension draws the narrow tip upward while its base
                 // spreads back to the original width, rather than shrinking away.
                 float lipWidth = max(0.01, currentH * 1.10 * u_bulgeWidth *
@@ -203,8 +203,8 @@ export const fragmentShader = `
                 float shoulderX = min(1.0, abs(uv.x - 72.0) / lipWidth);
                 float shoulder = 0.5 + 0.5 * cos(3.14159265 * shoulderX);
                 float dLip = uv.y - lipDepth * shoulder;
-                float dIsland = u_drop < 0.74
-                    ? smoothUnion(dOrb, dLip, max(0.001, currentH * 0.60 * (1.0 - smoothstep(0.20, 0.40, u_drop))))
+                float dIsland = u_drop < 0.60
+                    ? smoothUnion(dOrb, dLip, max(0.001, currentH * 0.60 * (1.0 - smoothstep(0.20, 0.32, u_drop))))
                     : dOrb;
 
                 float afwidth = length(vec2(dFdx(dIsland), dFdy(dIsland))) * 0.7071;
@@ -369,9 +369,9 @@ export const fragmentShader = `
                 lights += vec3(1.0, 0.97, 0.93) * sheen;
                 float lightAlpha = clamp(max(max(lights.r, lights.g), lights.b), 0.0, 1.0);
                 float alpha = max(bodyAlpha, lightAlpha);
-                // The neck is pure black; illumination belongs to the detached glass.
+                // Keep the bezel black, but reveal the glass during separation.
                 float orbMask = 1.0 - smoothstep(-1.0, 1.0, dOrb);
-                float glassReveal = smoothstep(0.32, 0.84, u_drop);
+                float glassReveal = smoothstep(0.12, 0.32, u_drop);
                 vec3 color = clamp((glassBody + lights) / max(alpha, 0.001), 0.0, 1.0) * orbMask * glassReveal;
                 alpha = mix(1.0, alpha, orbMask * glassReveal);
                 gl_FragColor = vec4(color, edgeIsland * alpha);
