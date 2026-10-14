@@ -174,27 +174,33 @@ export const fragmentShader = `
                 vec2 uv = vec2(vUv.x, 1.0 - vUv.y) * u_resolution;
                 float currentH = mix(41.0, 43.0, u_circle);
                 // Two simple surfaces: a rounded bezel bulge and a compact drop.
-                // Their smooth union pinches off as the bulge retracts.
-                float fall = smoothstep(0.0, 0.68, u_drop);
-                float grow = mix(0.35, 1.0, smoothstep(0.0, 0.82, u_drop));
+                // The drop clears the bulge before it spreads back into the bezel.
+                float fall = smoothstep(0.0, 0.44, u_drop);
+                float grow = mix(0.35, 1.0, smoothstep(0.0, 1.0, u_drop));
                 float widen = smoothstep(0.24, 0.78, u_drop);
-                float topEdge = mix(-currentH * 0.70, u_top, fall);
-                float bounce = sin(smoothstep(0.52, 1.0, u_drop) * PI) * 4.0;
-                float centerY = topEdge + currentH * grow + bounce;
+                // Clear the moving bulge before its stretch flows into retraction.
+                float clearance = currentH * (0.60 * u_bulgeStretch + 0.14);
+                float topEdge = mix(-currentH * 0.70, max(u_top, clearance), fall);
+                topEdge = mix(topEdge, u_top, smoothstep(0.58, 1.0, u_drop));
+                // The clearance-to-rest trajectory supplies the positional settle.
+                float centerY = topEdge + currentH * grow;
                 vec2 p = (uv - vec2(72.0, centerY)) / grow;
                 p.x /= mix(0.70, 1.0, widen);
                 float dOrb = getIslandSDF(p, u_progress) * grow;
                 float birth = smoothstep(0.0, 0.12, u_drop);
-                float pull = smoothstep(0.10, 0.30, u_drop);
-                float retract = 1.0 - smoothstep(0.30, 0.50, u_drop);
+                float pull = smoothstep(0.08, 0.50, u_drop);
+                float reabsorb = smoothstep(0.50, 0.74, u_drop);
+                float retract = 1.0 - reabsorb;
+                // Surface tension draws the narrow tip upward while its base
+                // spreads back to the original width, rather than shrinking away.
                 float lipWidth = max(0.01, currentH * 1.10 * u_bulgeWidth *
-                    mix(1.0, 0.65, pull) * birth * retract);
+                    mix(mix(1.0, 0.65, pull), 1.0, reabsorb) * birth);
                 float lipDepth = currentH * mix(0.18, 0.60, pull) *
                     u_bulgeStretch * birth * retract;
                 float shoulder = max(0.0, 1.0 - pow((uv.x - 72.0) / lipWidth, 2.0));
                 float dLip = uv.y - lipDepth * shoulder * shoulder;
-                float dIsland = u_drop < 0.50
-                    ? smoothUnion(dOrb, dLip, max(0.001, currentH * 0.12 * retract))
+                float dIsland = u_drop < 0.74
+                    ? smoothUnion(dOrb, dLip, max(0.001, currentH * 0.12 * (1.0 - smoothstep(0.30, 0.44, u_drop))))
                     : dOrb;
 
                 float afwidth = length(vec2(dFdx(dIsland), dFdy(dIsland))) * 0.7071;
