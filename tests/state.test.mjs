@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readActivity, audioLevel, Spring } from '../src/state.js';
 import { IslandRenderer } from '../src/renderer.js';
+import { sphereDisplacement } from '../src/lens.js';
 
 const bar = (classes, level = '0') => ({ classList: new Set(classes.split(' ')), style: { getPropertyValue: () => level } });
 const makeBar = (...args) => { const b = bar(...args); b.classList.contains = b.classList.has; return b; };
@@ -63,5 +64,27 @@ test('thinking reaches the spinning phase within a second, including slow frames
     for (let t = 0; t < 0.6; t += elapsed)
       renderer.render(Math.min(elapsed, .05), {state: 'speaking', level: 0, elapsed});
     assert.equal(renderer.thinking, 0);
+  }
+});
+
+
+test('spherical lens preserves the center and compresses into a continuous rim', () => {
+  assert.equal(sphereDisplacement(0), 0);
+  assert.equal(sphereDisplacement(1), 0);
+  const source = r => r + sphereDisplacement(r);
+  assert.equal(source(.3), .3, 'central window should preserve the scene');
+  assert.ok(source(.5) > .45, 'middle should have only mild distortion');
+  assert.ok((source(.99) - source(.98)) / .01 > 2, 'rim should compress detail');
+});
+
+test('lens strength range preserves radial ordering without folded or inverted text', () => {
+  for (const gain of [0, 1, 120 / 64]) {
+    let previous = 0;
+    for (let i = 1; i <= 1000; i++) {
+      const r = i / 1000;
+      const source = r + gain * sphereDisplacement(r);
+      assert.ok(Number.isFinite(source) && source > previous && source <= 1);
+      previous = source;
+    }
   }
 });

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.16
+
+- Use spherical lens refraction to preserve the center and bend detail into the rim.
+- Keep the backdrop displacement aligned and proportional when the orb resizes.
+- Add a text and grid preview for comparing glass distortion.
+
 ## 0.2.15
 
 - Slightly slow the full entrance while preserving its phase timing proportions.

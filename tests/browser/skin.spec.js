@@ -145,3 +145,30 @@ test('status labels are hidden unless their opt-in class is present', async ({ p
   await page.getByLabel('Show status label').uncheck();
   await expect(label).toBeHidden();
 });
+
+
+test('lens bounds and optical strength track resized orb geometry', async ({ page }) => {
+  await page.goto('/demo/glass.html');
+  const geometry = () => page.locator('.siri-island-refraction').evaluate(el => {
+    const filter = el.parentElement.querySelector('filter');
+    const image = filter.querySelector('feImage');
+    return { width: el.clientWidth, height: el.clientHeight,
+      filterWidth: Number(filter.getAttribute('width')), filterHeight: Number(filter.getAttribute('height')),
+      imageWidth: Number(image.getAttribute('width')), imageHeight: Number(image.getAttribute('height')),
+      scale: Number(filter.querySelector('feDisplacementMap').getAttribute('scale')) };
+  });
+  await expect.poll(async () => (await geometry()).filterWidth).toBeGreaterThan(0);
+  const before = await geometry();
+  expect(before.filterWidth).toBe(before.width);
+  expect(before.filterHeight).toBe(before.height);
+  await page.evaluate(() => document.getElementById('voice-satellite-ui').style.setProperty('--siri-island-width','240px'));
+  await expect.poll(async () => (await geometry()).width).not.toBe(before.width);
+  await expect.poll(async () => (await geometry()).filterWidth).toBe((await geometry()).width);
+  const after = await geometry();
+  expect(after.imageWidth).toBe(after.width);
+  expect(after.imageHeight).toBe(after.height);
+  expect(after.scale / after.width).toBeCloseTo(before.scale / before.width, 4);
+  await page.locator('#strength').focus();
+  await page.keyboard.press('Home');
+  await expect(page.locator('.siri-island-refraction')).toBeHidden();
+});

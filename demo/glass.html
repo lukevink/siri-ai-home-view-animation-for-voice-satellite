@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Glass refraction comparison</title>
+<style>
+body { margin:0; color:#202124; background:#fff; font:24px/1.6 system-ui,sans-serif; }
+header { padding:20px; position:relative; z-index:10003; background:#eef2f5; display:flex; gap:24px; align-items:center; font-size:15px; }
+main { padding:35px 6vw; background-image:linear-gradient(#6497c522 1px,transparent 1px),linear-gradient(90deg,#6497c522 1px,transparent 1px); background-size:40px 40px; }
+p { margin:15px 0; } a {color:inherit} input {vertical-align:middle}
+#voice-satellite-ui {--siri-island-enabled:1;--siri-island-width:600px;--siri-island-top:160px;--siri-island-entrance:none;--siri-island-backdrop-blur:0px;}
+body.lens-only .siri-island canvas {visibility:hidden}
+</style><style id="voice-satellite-custom-css"></style>
+</head><body>
+<header><a href="/">Dashboard preview</a><label>Refraction <input id="strength" type="range" min="0" max="120" value="64"><output>64</output></label><label><input id="lens-only" type="checkbox"> Show lens without lighting</label></header>
+<main id="pattern"></main>
+<div id="voice-satellite-ui"><div class="vs-rainbow-bar visible listening"></div></div>
+<script type="module">
+const main=document.querySelector('main');
+for(let i=0;i<15;i++){const p=document.createElement('p');p.textContent=`${String(i+1).padStart(2,'0')}  Your home, at a word. Lights · Music · Climate · Energy · Living room · Kitchen`;main.append(p)}
+const input=document.querySelector('#strength');input.oninput=()=>{document.querySelector('output').textContent=input.value;document.querySelector('#voice-satellite-custom-css').textContent=`#voice-satellite-ui { --siri-island-refraction: ${input.value}; }`};
+document.querySelector('#lens-only').onchange=e=>document.body.classList.toggle('lens-only',e.target.checked);
+</script><script type="module" src="../dist/siri-island.js"></script></body></html>
