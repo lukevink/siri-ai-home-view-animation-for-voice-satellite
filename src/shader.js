@@ -175,9 +175,10 @@ export const fragmentShader = `
                 float currentH = mix(41.0, 43.0, u_circle);
                 // Two simple surfaces: a rounded bezel bulge and a compact drop.
                 // The drop clears the bulge before it spreads back into the bezel.
-                float fall = smoothstep(0.0, 0.44, u_drop);
+                float releasePhase = u_drop / 1.15;
+                float fall = smoothstep(0.0, 0.44, releasePhase);
                 float grow = mix(0.35, 1.0, fall);
-                float widen = smoothstep(0.32, 0.78, u_drop);
+                float widen = smoothstep(0.36, 0.65, u_drop);
                 // Stop at the resting height; only width continues expanding
                 // after the drop separates. No clearance overshoot or bounce.
                 float topEdge = mix(-currentH * 0.70, u_top, fall);
@@ -185,13 +186,13 @@ export const fragmentShader = `
                 vec2 p = (uv - vec2(72.0, centerY)) / grow;
                 p.x /= mix(0.70, 1.0, widen);
                 float dOrb = getIslandSDF(p, u_progress) * grow;
-                float birth = smoothstep(0.0, 0.12, u_drop);
-                float pull = smoothstep(0.08, 0.28, u_drop);
+                float birth = smoothstep(0.0, 0.12, releasePhase);
+                float pull = smoothstep(0.08, 0.28, releasePhase);
                 // Once the drop clears, the stretched liquid recoils quickly
                 // into a broad shallow shoulder, then settles flush with the edge.
-                float reabsorb = smoothstep(0.28, 0.36, u_drop);
+                float reabsorb = smoothstep(0.28, 0.36, releasePhase);
                 float retract = (1.0 - 0.82 * reabsorb) *
-                    (1.0 - smoothstep(0.36, 0.60, u_drop));
+                    (1.0 - smoothstep(0.36, 0.60, releasePhase));
                 // Surface tension draws the narrow tip upward while its base
                 // spreads back to the original width, rather than shrinking away.
                 float lipWidth = max(0.01, currentH * 1.10 * u_bulgeWidth *
@@ -201,8 +202,8 @@ export const fragmentShader = `
                 float shoulderX = min(1.0, abs(uv.x - 72.0) / lipWidth);
                 float shoulder = 0.5 + 0.5 * cos(3.14159265 * shoulderX);
                 float dLip = uv.y - lipDepth * shoulder;
-                float dIsland = u_drop < 0.60
-                    ? smoothUnion(dOrb, dLip, max(0.001, currentH * 0.60 * (1.0 - smoothstep(0.20, 0.32, u_drop))))
+                float dIsland = releasePhase < 0.60
+                    ? smoothUnion(dOrb, dLip, max(0.001, currentH * 0.60 * (1.0 - smoothstep(0.20, 0.32, releasePhase))))
                     : dOrb;
 
                 float afwidth = length(vec2(dFdx(dIsland), dFdy(dIsland))) * 0.7071;
@@ -369,7 +370,7 @@ export const fragmentShader = `
                 float alpha = max(bodyAlpha, lightAlpha);
                 // Keep the bezel black, but reveal the glass during separation.
                 float orbMask = 1.0 - smoothstep(-1.0, 1.0, dOrb);
-                float glassReveal = smoothstep(0.12, 0.32, u_drop);
+                float glassReveal = smoothstep(0.12, 0.32, releasePhase);
                 vec3 color = clamp((glassBody + lights) / max(alpha, 0.001), 0.0, 1.0) * orbMask * glassReveal;
                 alpha = mix(1.0, alpha, orbMask * glassReveal);
                 gl_FragColor = vec4(color, edgeIsland * alpha);

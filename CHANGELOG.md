@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.14
+
+- Slightly slow the bezel release and shorten the final width expansion.
+
 ## 0.2.13
 
 - Stop the drop at its resting height without overshoot, then finish widening after separation.
