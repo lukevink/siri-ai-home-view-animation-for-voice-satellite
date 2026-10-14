@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.15
+
+- Slightly slow the full entrance while preserving its phase timing proportions.
+- Add a subtle positional overshoot without bouncing the orb's scale.
+
 ## 0.2.14
 
 - Slightly slow the bezel release and shorten the final width expansion.
