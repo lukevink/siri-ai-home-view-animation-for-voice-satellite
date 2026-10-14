@@ -628,15 +628,16 @@ var GlassRefraction = class {
     this.host = host;
     const id = `siri-glass-${Math.random().toString(36).slice(2)}`;
     const map = document.createElement("canvas");
-    map.width = map.height = 128;
+    const size = 256;
+    map.width = map.height = size;
     const context = map.getContext("2d");
     if (!context) return;
-    const pixels = context.createImageData(128, 128);
-    for (let y = 0; y < 128; y++) for (let x = 0; x < 128; x++) {
-      const nx = (x + 0.5) / 64 - 1, ny = (y + 0.5) / 64 - 1;
+    const pixels = context.createImageData(size, size);
+    for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) {
+      const nx = (x + 0.5) / (size / 2) - 1, ny = (y + 0.5) / (size / 2) - 1;
       const r = Math.hypot(nx, ny);
-      const bend = r < 1 ? Math.pow(r, 3) * Math.sqrt(1 - r) * 4 : 0;
-      const i = (y * 128 + x) * 4;
+      const bend = r < 1 ? Math.min(0.98, r * r * Math.sqrt(1 - r) * 3.6) : 0;
+      const i = (y * size + x) * 4;
       pixels.data.set([
         128 - nx / Math.max(r, 1e-3) * bend * 127,
         128 - ny / Math.max(r, 1e-3) * bend * 127,
@@ -651,7 +652,7 @@ var GlassRefraction = class {
     this.svg.setAttribute("height", "0");
     this.svg.setAttribute("aria-hidden", "true");
     this.svg.style.position = "absolute";
-    this.svg.innerHTML = `<defs><filter id="${id}" x="0%" y="0%" width="100%" height="100%" color-interpolation-filters="sRGB"><feImage width="100%" height="100%" preserveAspectRatio="none" result="lens"/><feDisplacementMap in="SourceGraphic" in2="lens" xChannelSelector="R" yChannelSelector="G" scale="18"/></filter></defs>`;
+    this.svg.innerHTML = `<defs><filter id="${id}" x="0%" y="0%" width="100%" height="100%" color-interpolation-filters="sRGB"><feImage width="100%" height="100%" preserveAspectRatio="none" result="lens"/><feDisplacementMap in="SourceGraphic" in2="lens" xChannelSelector="R" yChannelSelector="G" scale="36"/></filter></defs>`;
     this.svg.querySelector("feImage").setAttribute("href", map.toDataURL());
     this.displace = this.svg.querySelector("feDisplacementMap");
     this.el = document.createElement("div");
@@ -734,7 +735,7 @@ var Island = class {
       bottomGlow: number("--siri-island-bottom-glow", 0.8, 2),
       entrance: style.getPropertyValue("--siri-island-entrance").trim() !== "none"
     };
-    this.refraction = number("--siri-island-refraction", 18, 40);
+    this.refraction = number("--siri-island-refraction", 36, 80);
     this.el.dataset.shape = this.appearance.circle ? "circle" : "island";
     const next = readActivity(this.bar);
     const wasIdle = this.state === "idle";

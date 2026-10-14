@@ -31,8 +31,8 @@ document.getElementById('sequence').addEventListener('click', () => {
 });
 levelInput.addEventListener('input', () => document.getElementById('level-output').textContent = `${Math.round(Number(levelInput.value) * 100)}%`);
 function appearance() {
-  for (const id of ['left', 'top', 'bulge-width', 'bulge-stretch']) {
-    document.getElementById(id + '-output').textContent = document.getElementById(id).value + (id === 'left' ? '%' : id === 'top' ? 'px' : '×');
+  for (const id of ['left', 'top', 'bulge-width', 'bulge-stretch', 'refraction']) {
+    document.getElementById(id + '-output').textContent = document.getElementById(id).value + (id === 'left' ? '%' : id === 'top' || id === 'refraction' ? 'px' : '×');
   }
   document.getElementById('voice-satellite-custom-css').textContent = `#voice-satellite-ui {
     --siri-island-enabled: ${Number(document.getElementById('enabled').checked)};
@@ -41,11 +41,12 @@ function appearance() {
     --siri-island-top: ${document.getElementById('top').value}px;
     --siri-island-bulge-width: ${document.getElementById('bulge-width').value};
     --siri-island-bulge-stretch: ${document.getElementById('bulge-stretch').value};
+    --siri-island-refraction: ${document.getElementById('refraction').value};
     --siri-island-shape: ${document.getElementById('shape').value};
     --siri-island-glass-opacity: ${document.getElementById('opacity').value};
   }`;
 }
-for (const id of ['enabled', 'shape', 'opacity', 'left', 'top', 'bulge-width', 'bulge-stretch']) document.getElementById(id).addEventListener('input', appearance);
+for (const id of ['enabled', 'shape', 'opacity', 'left', 'top', 'bulge-width', 'bulge-stretch', 'refraction']) document.getElementById(id).addEventListener('input', appearance);
 document.getElementById('light-backdrop').addEventListener('change', e => document.body.classList.toggle('light-backdrop', e.target.checked));
 document.getElementById('drop-preview').addEventListener('click', () => {
   cancelSequence(); setState('idle'); timers.push(setTimeout(() => setState('listening'), 1000));
