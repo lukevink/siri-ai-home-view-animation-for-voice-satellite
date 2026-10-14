@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.13
+
+- Stop the drop at its resting height without overshoot, then finish widening after separation.
+
 ## 0.2.12
 
 - Recoil the bulge into a shallow shoulder by the 35% entrance frame and reveal the glass during separation.
