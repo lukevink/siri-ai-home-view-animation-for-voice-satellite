@@ -164,8 +164,8 @@ export const fragmentShader = `
             vec2 dotCenter(float index, float time) {
                 float t = -time * 0.85;
                 float angle = index * (PI / 3.0) + t * 0.65;
-                float radius = 0.40 + 0.025 * sin(t * 1.7 + index);
-                return vec2(cos(angle), sin(angle) * 0.72) * radius * 43.0;
+                float radius = 0.40;
+                return vec2(cos(angle), sin(angle)) * radius * 43.0;
             }
 
             float dotSize(float index, float time) {
@@ -176,34 +176,43 @@ export const fragmentShader = `
                 if (u_drop <= 0.0) { gl_FragColor = vec4(0.0); return; }
                 vec2 uv = vec2(vUv.x, 1.0 - vUv.y) * u_resolution;
                 float currentH = mix(41.0, 43.0, u_circle);
-                // Extrude, pinch off, then settle: one continuous surface at the bezel.
-                float travel = smoothstep(0.0, 0.78, u_drop);
-                float settle = sin((u_drop - 0.78) * 18.0) *
-                    (1.0 - smoothstep(0.78, 1.0, u_drop)) * 3.0 * step(0.78, u_drop);
-                float centerY = mix(-22.0, u_top + currentH + 5.0, travel) + settle;
-                float grow = mix(0.32, 1.0, smoothstep(0.08, 0.85, u_drop));
+                // A small droplet first pulls out of the bezel. Most of its
+                // expansion happens AFTER pinch-off, matching the reference's
+                // narrow teardrop becoming a full round orb below a flat edge.
+                float detach = smoothstep(0.10, 0.52, u_drop);
+                float expand = smoothstep(0.52, 0.96, u_drop);
+                float finalY = u_top + currentH + 5.0;
+                float centerY = mix(-12.0, finalY * 0.62, detach);
+                centerY = mix(centerY, finalY, expand);
+                float grow = mix(0.28, 0.52, detach);
+                grow = mix(grow, 1.0, expand);
                 vec2 p = uv - vec2(72.0, centerY);
                 p /= grow;
-                p.y /= 1.0 + 0.22 * sin(u_drop * PI);
+                float stretch = 1.0 + 0.30 * sin(detach * PI) + 0.16 * (1.0 - expand) * detach;
+                p.y /= stretch;
+                // Narrow the top of the emerging drop; return to a true circle
+                // as it grows. This geometry also runs in reverse on dismissal.
+                p.x /= 1.0 - 0.16 * (1.0 - expand) * smoothstep(0.0, 30.0, -p.y);
                 float dOrb = getIslandSDF(p, u_progress) * grow;
                 float neckEnd = max(centerY, 1.0);
                 float along = clamp(uv.y / neckEnd, 0.0, 1.0);
-                float pinch = 1.0 - smoothstep(0.38, 0.72, u_drop);
+                float pinch = 1.0 - smoothstep(0.28, 0.50, u_drop);
                 float birth = smoothstep(0.0, 0.16, u_drop);
-                float neckWidth = (5.0 + 53.0 * pow(1.0 - along, 2.6)) * pinch * birth;
+                float neckWidth = (3.0 + 40.0 * pow(1.0 - along, 2.8)) * pinch * birth;
                 float dNeck = max(abs(uv.x - 72.0) - neckWidth, uv.y - neckEnd);
                 // A broad, shallow pool grows directly out of the screen edge.
                 // Its curved shoulders narrow into the stretching neck, then
                 // retract after pinch-off. Reversing u_drop rejoins that pool.
-                float lipWidth = max(0.01, 69.0 * birth * pinch);
-                float lipDepth = max(0.01, 15.0 * birth * pinch);
+                float retract = 1.0 - smoothstep(0.30, 0.66, u_drop);
+                float lipWidth = max(0.01, 47.0 * birth * retract);
+                float lipDepth = max(0.01, 23.0 * birth * retract);
                 float shoulder = max(0.0, 1.0 - pow((uv.x - 72.0) / lipWidth, 2.0));
                 float dLip = uv.y - lipDepth * shoulder * shoulder;
-                dNeck = min(dNeck, dLip);
-                float join = 10.0 * pinch;
+                dNeck = pinch > 0.001 ? min(dNeck, dLip) : dLip;
+                float join = 7.0 * pinch;
                 float blend = max(join - abs(dOrb - dNeck), 0.0) / max(join, 0.001);
                 float joined = min(dOrb, dNeck) - blend * blend * join * 0.25;
-                float dIsland = u_drop < 0.72 ? joined : dOrb;
+                float dIsland = u_drop < 0.66 ? joined : dOrb;
 
                 float afwidth = length(vec2(dFdx(dIsland), dFdy(dIsland))) * 0.7071;
                 float edgeIsland = (1.0 - smoothstep(-afwidth, afwidth, dIsland));
@@ -366,7 +375,7 @@ export const fragmentShader = `
                 float alpha = max(bodyAlpha, lightAlpha);
                 // The neck is pure black; illumination belongs to the detached glass.
                 float orbMask = 1.0 - smoothstep(-1.0, 1.0, dOrb);
-                float glassReveal = smoothstep(0.28, 0.8, u_drop);
+                float glassReveal = smoothstep(0.32, 0.84, u_drop);
                 vec3 color = clamp((glassBody + lights) / max(alpha, 0.001), 0.0, 1.0) * orbMask * glassReveal;
                 alpha = mix(1.0, alpha, orbMask * glassReveal);
                 gl_FragColor = vec4(color, edgeIsland * alpha);
