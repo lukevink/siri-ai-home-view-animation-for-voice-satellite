@@ -1,4 +1,4 @@
-/*! Siri AI Home View Animation for Voice Satellite 0.2.5 — AGPL-3.0-only.
+/*! Siri AI Home View Animation for Voice Satellite 0.2.6 — AGPL-3.0-only.
  * Source: https://github.com/lukevink/siri-homeview-hass-animation
  * Shader adapted from neeldedkawala/ios-siri-animation (MIT).
 MIT License
@@ -317,7 +317,7 @@ var _=`/* Scoped to the opt-in host: other Voice Satellite skins stay untouched.
             // Original motion; visual inspiration: 40973894's Siri Wave / Fluid Dots.
             vec2 dotCenter(float index, float time) {
                 float t = -time * 0.85;
-                float angle = index * (2.0 * PI / 5.0) + t * 0.65;
+                float angle = index * (2.0 * PI / 5.0) + t * 1.6;
                 float radius = 0.40;
                 return vec2(cos(angle), sin(angle)) * radius * 43.0;
             }
@@ -349,14 +349,15 @@ var _=`/* Scoped to the opt-in host: other Voice Satellite skins stay untouched.
                 float along = clamp(uv.y / neckEnd, 0.0, 1.0);
                 float pinch = 1.0 - smoothstep(0.28, 0.50, u_drop);
                 float birth = smoothstep(0.0, 0.16, u_drop);
-                float neckWidth = (3.0 + 40.0 * u_bulgeWidth * pow(1.0 - along, 2.8)) * pinch * birth;
+                float narrow = mix(1.0, 0.38, smoothstep(0.08, 0.48, u_drop));
+                float neckWidth = (3.0 + 40.0 * u_bulgeWidth * narrow * pow(1.0 - along, 2.8)) * pinch * birth;
                 float dNeck = max(abs(uv.x - 72.0) - neckWidth, uv.y - neckEnd);
                 // A broad, shallow pool grows directly out of the screen edge.
                 // Its curved shoulders narrow into the stretching neck, then
                 // retract after pinch-off. Reversing u_drop rejoins that pool.
-                float retract = 1.0 - smoothstep(0.30, 0.66, u_drop);
-                float lipWidth = max(0.01, 47.0 * u_bulgeWidth * birth * retract);
-                float lipDepth = max(0.01, 23.0 * u_bulgeStretch * birth * retract);
+                float retract = 1.0 - smoothstep(0.40, 0.66, u_drop);
+                float lipWidth = max(0.01, 47.0 * u_bulgeWidth * narrow * birth * retract);
+                float lipDepth = max(0.01, mix(9.0, 32.0, smoothstep(0.08, 0.40, u_drop)) * u_bulgeStretch * birth * retract);
                 float shoulder = max(0.0, 1.0 - pow((uv.x - 72.0) / lipWidth, 2.0));
                 float dLip = uv.y - lipDepth * shoulder * shoulder;
                 dNeck = pinch > 0.001 ? min(dNeck, dLip) : dLip;

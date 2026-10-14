@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.6
+
+- Increase thinking-dot rotation speed.
+- Stretch the bezel bulge from broad and shallow to narrow and tall before it retracts.
+
 ## 0.2.5
 
 - Contract voice waves into one dot and expand into five spinning dots in 550 ms.
