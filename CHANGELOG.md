@@ -2,6 +2,8 @@
 
 ## 0.2.7
 
+- Complete the coordinated drop entrance in 450 ms.
+
 - Hide status labels unless the UI has the `siri-island-show-status` class.
 
 - Scale the bulge, neck, and default resting gap with the orb diameter.
