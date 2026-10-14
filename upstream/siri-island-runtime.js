@@ -202,13 +202,11 @@ var fragmentShader = `
                 // Two simple surfaces: a rounded bezel bulge and a compact drop.
                 // The drop clears the bulge before it spreads back into the bezel.
                 float fall = smoothstep(0.0, 0.44, u_drop);
-                float grow = mix(0.35, 1.0, smoothstep(0.0, 1.0, u_drop));
-                float widen = smoothstep(0.24, 0.78, u_drop);
-                // Clear the moving bulge before its stretch flows into retraction.
-                float clearance = currentH * (0.60 * u_bulgeStretch + 0.14);
-                float topEdge = mix(-currentH * 0.70, max(u_top, clearance), fall);
-                topEdge = mix(topEdge, u_top, smoothstep(0.58, 1.0, u_drop));
-                // The clearance-to-rest trajectory supplies the positional settle.
+                float grow = mix(0.35, 1.0, fall);
+                float widen = smoothstep(0.32, 0.78, u_drop);
+                // Stop at the resting height; only width continues expanding
+                // after the drop separates. No clearance overshoot or bounce.
+                float topEdge = mix(-currentH * 0.70, u_top, fall);
                 float centerY = topEdge + currentH * grow;
                 vec2 p = (uv - vec2(72.0, centerY)) / grow;
                 p.x /= mix(0.70, 1.0, widen);
