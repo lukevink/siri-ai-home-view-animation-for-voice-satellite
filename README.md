@@ -6,12 +6,6 @@ A liquid drop from the top bezel that settles into a transparent glass orb or ro
 
 ![Animated Home View orb: liquid bezel entrance, waves morphing into thinking dots, speech and bezel return](docs/home-view-preview.gif)
 
-Preview: the real renderer over a cropped Home Assistant dashboard still, with simulated voice activity.
-
-Version 0.2 adds a liquid bezel entrance and return, a circular orb option, transparent glass with a white lower glow, waves that morph into fluid thinking dots, and a rounded black caption panel. Run the local preview below to compare both shapes and light/dark backgrounds.
-
-**Status: experimental 0.2.3.** The skin has been used with Home Assistant and Android Kiosk Satellite. The bezel return is checked in the local preview and browser compatibility tests. Browser support and device performance can vary. This is an independent community extension, not an official Voice Satellite or Apple product.
-
 ## What you install
 
 This is a **companion JavaScript frontend resource**, enabled through Voice Satellite's Custom CSS field. Voice Satellite currently bundles its skins; it does not document a public API for registering third-party JavaScript skins. Consequently this extension does **not** add another item to its skin dropdown. Select the existing **Siri** skin and enable the island using the CSS below.
@@ -32,7 +26,7 @@ It uses the same activity-bar classes and `--vs-audio-level` value that Voice Sa
 
 Install [Voice Satellite](https://github.com/jxlarrea/voice-satellite-card-integration) and configure a working Assist pipeline and a satellite on the browser/device you want to use. Confirm a normal voice interaction works first. Installing this skin alone does not enable voice control.
 
-The adapter was developed against Voice Satellite commit [`78f0f4b`](https://github.com/jxlarrea/voice-satellite-card-integration/commit/78f0f4b74fec0d5be39de9089915dd1129991096). Its DOM selectors are internal compatibility points, not a guaranteed public API. Future upstream changes may require updating this extension.
+This extension depends on Voice Satellite’s internal interface. Changes to Voice Satellite may require a compatible skin update.
 
 ## Install with HACS
 
@@ -89,8 +83,6 @@ No Python component, card YAML, or access token is required. Keep the copyright/
 
 ## Adjusting the appearance
 
-The `--siri-island-*` CSS names and `siri-island.js` filename remain compatible with earlier installations.
-
 | Setting | Default | Effect |
 | --- | --- | --- |
 | `--siri-island-shape` | `circle` | `circle` selects the spherical orb; `island` retains the rounded shape. |
@@ -102,11 +94,13 @@ The `--siri-island-*` CSS names and `siri-island.js` filename remain compatible 
 | `--siri-island-entrance` | `drop` | Set `none` to disable the liquid entrance and return. Reduced-motion users also skip it. |
 | `--siri-island-backdrop-blur` | `2px` | Blur applied to Voice Satellite's full-screen backdrop. |
 
-The lower glass is genuinely transparent to the dashboard. A separate SVG backdrop displacement layer bends the actual dashboard behind the settled orb in browsers that support SVG backdrop filters (verified in Chromium). The WebGL shader adds the illuminated rim and subtle studio reflections. Safari and other browsers without SVG backdrop-filter support retain the transparent glass without live distortion. This is a browser approximation, not Apple’s system compositor. No DOM screenshot capture or additional network requests are involved. Fluid dots are an original lightweight smooth-union shader inspired by [40973894's Siri Wave / Fluid Dots](https://21st.dev/@40973894/components/siri-wave/fluid-dots); no React dependency or code from that component is bundled.
+The lower half of the orb is transparent to the dashboard. A separate SVG backdrop displacement layer bends the actual dashboard behind the settled orb in browsers that support SVG backdrop filters. The WebGL shader adds the illuminated rim and subtle studio reflections. Safari and other browsers without SVG backdrop-filter support retain the transparent glass without live distortion. This is a browser approximation, not Apple’s system compositor. No DOM screenshot capture or additional network requests are involved. Fluid dots are an original lightweight smooth-union shader inspired by [40973894's Siri Wave / Fluid Dots](https://21st.dev/@40973894/components/siri-wave/fluid-dots); no React dependency or code from that component is bundled.
 
-### Updating from Siri Island 0.1
+## Updating
 
-The repository was renamed from `lukevink/siriAI-voicesatellite` and briefly used `lukevink/siri-ai-home-view-animation-for-voice-satellite`. GitHub redirects the previous repository URLs. Existing HACS installations may retain `/hacsfiles/siriAI-voicesatellite/siri-island.js` or `/hacsfiles/siri-ai-home-view-animation-for-voice-satellite/siri-island.js`; keep the resource path actually provided by HACS rather than changing it blindly. New installations use the new repository name shown above. Reload the dashboard after updating, to get the new circular orb. Set `--siri-island-shape: island` in a browser's Custom CSS to retain the old rounded shape.
+Update through HACS, then reload the dashboard. If the repository folder changes, update the URL in Dashboard Resources and `frontend.extra_module_url` to the path provided by HACS. Remove obsolete resource entries so only the current skin loads. Restart Home Assistant after changing `configuration.yaml`.
+
+## Compatibility
 
 When TTS is played on a remote speaker, Voice Satellite does not expose that speaker's audio levels to this browser. The skin still animates, but its movement is procedural rather than synchronized with remote audio. A wake chime or delay can also use an upstream synthetic level; the extension displays the signal it receives.
 
@@ -124,18 +118,16 @@ npm run build
 npm run preview
 ```
 
-Open `http://127.0.0.1:4173`. The preview has simulated listening, thinking, speaking, audio level, and skin controls; it does not connect to your home or record audio. Dashboard content in the preview is illustrative.
+Open `http://127.0.0.1:4173`. The preview has simulated listening, thinking, speaking, audio level, and skin controls; it does not connect to your home or record audio.
 
 ```sh
 npx playwright install chromium webkit
 npm run check
 ```
 
-The browser tests exercise WebGL shader compilation, state changes, teardown/re-enable, UI replacement, duplicate loading, fallback, context loss, visibility transitions, and reduced motion. The test fixture is Voice Satellite's real Siri stylesheet at the pinned commit. Passing these tests does not establish end-to-end compatibility with every Home Assistant installation.
-
 ### Contributing it as a built-in skin
 
-[`upstream/`](upstream/README.md) includes an adapter that adds **Siri Island** as a selectable built-in skin in a source checkout of Voice Satellite. It shares this project's renderer. That route requires rebuilding Voice Satellite and is intended for an upstream contribution or a maintained fork. It has not been accepted by the upstream project.
+[`upstream/`](upstream/README.md) includes an adapter that adds **Siri Island** as a selectable built-in skin in a source checkout of Voice Satellite. It shares this project's renderer. That route requires rebuilding Voice Satellite and is intended for an upstream contribution or a maintained fork.
 
 ## Credits and licenses
 
