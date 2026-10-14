@@ -4,7 +4,7 @@ A liquid drop from the top bezel that settles into a transparent glass orb or ro
 
 **The original animation is by [Neel Dedkawala](https://github.com/neeldedkawala).** This project adapts the shader and spring animation from his MIT-licensed **[iOS Siri Animation](https://github.com/neeldedkawala/ios-siri-animation)**. Please visit and credit the original project. The Home Assistant bridge, packaging, and audio-reactive adaptation are additions here.
 
-![Animated Home View orb: liquid bezel entrance, waves morphing into thinking dots, speech and bezel return](docs/home-view-preview.gif)
+<img src="docs/home-view-preview.gif" alt="Animated Home View orb: liquid bezel entrance, waves morphing into thinking dots, speech and bezel return" width="560">
 
 ## What you install
 
@@ -80,6 +80,8 @@ Merge this into an existing `frontend:` section rather than creating a duplicate
 3. Follow steps 5–7 from the HACS instructions.
 
 No Python component, card YAML, or access token is required. Keep the copyright/license banner in the distributed JavaScript file intact.
+
+![Circular orb and conversation captions over a dashboard](docs/dashboard-preview.gif)
 
 ## Adjusting the appearance
 
