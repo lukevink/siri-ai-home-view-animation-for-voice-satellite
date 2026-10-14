@@ -6,9 +6,11 @@ A liquid drop from the top bezel that settles into a transparent glass orb or ro
 
 ![Animated Home View orb: liquid bezel entrance, waves morphing into thinking dots, speech and bezel return](docs/home-view-preview.gif)
 
+Preview: the real renderer over a cropped Home Assistant dashboard still, with simulated voice activity.
+
 Version 0.2 adds a liquid bezel entrance and return, a circular orb option, transparent glass with a white lower glow, waves that morph into fluid thinking dots, and a rounded black caption panel. Run the local preview below to compare both shapes and light/dark backgrounds.
 
-**Status: experimental 0.2.2.** The skin has been used with Home Assistant and Android Kiosk Satellite. The bezel return is checked in the local preview and browser compatibility tests. Browser support and device performance can vary. This is an independent community extension, not an official Voice Satellite or Apple product.
+**Status: experimental 0.2.3.** The skin has been used with Home Assistant and Android Kiosk Satellite. The bezel return is checked in the local preview and browser compatibility tests. Browser support and device performance can vary. This is an independent community extension, not an official Voice Satellite or Apple product.
 
 ## What you install
 
@@ -80,7 +82,7 @@ Merge this into an existing `frontend:` section rather than creating a duplicate
 ## Manual installation
 
 1. Copy [`dist/siri-island.js`](dist/siri-island.js) to `/config/www/siri-island.js` on your Home Assistant server.
-2. Add `/local/siri-island.js?v=0.2.2` as a JavaScript module under Dashboard Resources, or use that URL under `frontend.extra_module_url` above.
+2. Add `/local/siri-island.js?v=0.2.3` as a JavaScript module under Dashboard Resources, or use that URL under `frontend.extra_module_url` above.
 3. Follow steps 5–7 from the HACS instructions.
 
 No Python component, card YAML, or access token is required. Keep the copyright/license banner in the distributed JavaScript file intact.

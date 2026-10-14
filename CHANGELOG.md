@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.3
+
+- Six thinking dots now follow a circular orbit with equal horizontal and vertical radius.
+- The bezel extrudes a smaller teardrop that pinches off before expanding into the full orb; dismissal reverses the same geometry.
+- Centered animated README preview over a cropped Home Assistant dashboard background.
+
 ## 0.2.2
 
 - Voice curves gather into one white droplet, then split into six smaller, faster liquid dots; the transition reverses when speech resumes.

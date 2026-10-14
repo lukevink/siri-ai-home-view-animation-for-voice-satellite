@@ -2,8 +2,7 @@
 .readme-caption { display: none; }
 body.readme-preview {
   min-height: 100vh;
-  background: repeating-linear-gradient(90deg, #b7d6dd44 0 72px, transparent 72px 144px),
-    radial-gradient(ellipse at 50% 5%, #eaf4f7, #c8dce4 70%);
+  background: #151515 url("/demo/dashboard-background.jpg") center top / 760px auto no-repeat;
 }
 .readme-preview::before {
   content: ''; position: fixed; inset: 0 0 auto; height: 10px;
@@ -11,15 +10,15 @@ body.readme-preview {
 }
 .readme-preview .shell { visibility: hidden; }
 .readme-preview .glass-test-pattern {
-  display: block; top: 84px; color: #2a4656; font-size: 17px; line-height: 32px;
+  display: none;
 }
 .readme-preview .vs-blur-overlay { background: transparent !important; }
-.readme-preview #voice-satellite-ui { --siri-island-backdrop-blur: 0px; }
+.readme-preview #voice-satellite-ui { --siri-island-backdrop-blur: 0px; --siri-island-width: 320px; }
 .readme-preview .vs-chat-container { display: none !important; }
 .readme-preview .readme-caption {
-  display: block; position: absolute; top: 292px; left: 50%; transform: translateX(-50%);
-  text-align: center; white-space: nowrap; color: #183444;
+  display: block; position: absolute; top: 310px; left: 50%; transform: translateX(-50%);
+  text-align: center; white-space: nowrap; color: #fff; text-shadow: 0 2px 12px #000;
 }
 .readme-caption h1 { font-size: 34px; font-weight: 600; letter-spacing: -1.2px; margin-bottom: 10px; }
-.readme-caption p { font-size: 15px; margin: 0 0 24px; color: #3f6073; }
-.readme-caption small { font-size: 9px; letter-spacing: 1.8px; color: #547386; }
+.readme-caption p { font-size: 15px; margin: 0 0 24px; color: #eee; }
+.readme-caption small { font-size: 9px; letter-spacing: 1.8px; color: #ccc; }
