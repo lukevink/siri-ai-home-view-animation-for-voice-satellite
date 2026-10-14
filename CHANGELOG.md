@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.9
+
+- Concentrate lens distortion around the rim while preserving the center, with stronger default displacement.
+
+- Fully separate the orb from the bulge before beginning bezel retraction.
+- Keep the bulge moving through the visible gap, flowing from stretch directly into retraction.
+- Spread the retracting bulge back across the bezel as its depth flattens, like a droplet being reabsorbed.
+
 ## 0.2.8
 
 - Increase default backdrop refraction, smooth the lens map, and add a strength slider to the preview.

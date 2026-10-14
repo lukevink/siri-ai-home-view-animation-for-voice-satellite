@@ -37,6 +37,7 @@ function appearance() {
   document.getElementById('voice-satellite-custom-css').textContent = `#voice-satellite-ui {
     --siri-island-enabled: ${Number(document.getElementById('enabled').checked)};
     --siri-island-width: 260px;
+    --siri-island-backdrop-blur: 0px;
     --siri-island-left: ${document.getElementById('left').value}%;
     --siri-island-top: ${document.getElementById('top').value}px;
     --siri-island-bulge-width: ${document.getElementById('bulge-width').value};

@@ -69,7 +69,7 @@ class Island {
       bottomGlow: number('--siri-island-bottom-glow', 0.8, 2),
       entrance: style.getPropertyValue('--siri-island-entrance').trim() !== 'none',
     };
-    this.refraction = number('--siri-island-refraction', 36, 80);
+    this.refraction = number('--siri-island-refraction', 64, 120);
     this.el.dataset.shape = this.appearance.circle ? 'circle' : 'island';
     const next = readActivity(this.bar);
     const wasIdle = this.state === 'idle';

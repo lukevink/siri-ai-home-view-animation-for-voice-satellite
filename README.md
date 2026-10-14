@@ -77,7 +77,7 @@ No Python component, card YAML, or access token is required. Keep the copyright/
 | `--siri-island-top` | Proportional | Gap below the safe-area inset after the drop settles; defaults to approximately 16% of the circular orb diameter. Set a pixel value to override. The entrance always starts at the viewport top. |
 | `--siri-island-glass-opacity` | `0.14` | Lower glass opacity from `0` to `1`; the upper cap stays dark. |
 | `--siri-island-bottom-glow` | `0.8` | White lower glow strength from `0` to `2`. |
-| `--siri-island-refraction` | `36` | Live backdrop displacement strength from `0` to `80` pixels; `0` disables it. |
+| `--siri-island-refraction` | `64` | Live backdrop displacement strength from `0` to `120` pixels; `0` disables it. |
 | `--siri-island-entrance` | `drop` | Set `none` to disable the liquid entrance and return. Reduced-motion users also skip it. |
 | `--siri-island-backdrop-blur` | `2px` | Blur applied to Voice Satellite's full-screen backdrop. |
 
