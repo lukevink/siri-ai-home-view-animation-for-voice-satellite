@@ -50,3 +50,18 @@ test('dismissal returns the full orb to the bezel and stops, including slow fram
   assert.equal(frame('idle', 1), false, 'stop drawing once the surface rejoins the bezel');
   assert.equal(renderer.drop, 0);
 });
+
+test('thinking reaches the spinning phase within a second, including slow frames', () => {
+  for (const elapsed of [1 / 30, 0.1]) {
+    const renderer = Object.assign(Object.create(IslandRenderer.prototype), {
+      spring: new Spring(), time: 0, fade: 1, intro: 1, level: 0, drop: 1, thinking: 0,
+      float() {}, gl: { drawArrays() {}, TRIANGLES: 4 },
+    });
+    for (let t = 0; t < 0.6; t += elapsed)
+      renderer.render(Math.min(elapsed, .05), {state: 'processing', level: 0, elapsed});
+    assert.equal(renderer.thinking, 1);
+    for (let t = 0; t < 0.6; t += elapsed)
+      renderer.render(Math.min(elapsed, .05), {state: 'speaking', level: 0, elapsed});
+    assert.equal(renderer.thinking, 0);
+  }
+});

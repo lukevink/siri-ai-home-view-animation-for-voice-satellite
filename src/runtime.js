@@ -64,6 +64,8 @@ class Island {
     this.appearance = {
       circle: style.getPropertyValue('--siri-island-shape').trim() !== 'island',
       opacity: number('--siri-island-glass-opacity', 0.14),
+      bulgeWidth: number('--siri-island-bulge-width', 1, 1.4),
+      bulgeStretch: number('--siri-island-bulge-stretch', 1, 2.5),
       bottomGlow: number('--siri-island-bottom-glow', 0.8, 2),
       entrance: style.getPropertyValue('--siri-island-entrance').trim() !== 'none',
     };
