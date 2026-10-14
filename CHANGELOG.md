@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.8
+
+- Increase default backdrop refraction, smooth the lens map, and add a strength slider to the preview.
+
+- Simplify the entrance to a rounded drop emerging from one bezel bulge, without a pointed tip or separate neck.
+- Add a frame-by-frame entrance preview.
+- Default the preview to a light Home Assistant-style sections dashboard.
+
 ## 0.2.7
 
 - Complete the coordinated drop entrance in 450 ms.

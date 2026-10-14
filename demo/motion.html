@@ -1,0 +1,8 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Entrance frame comparison</title><style>body{margin:0;background:#e3e8eb;font:14px system-ui}header{height:18px;background:black}canvas{display:block;margin:0 auto;width:360px;height:315px}section{padding:20px;display:flex;gap:12px;justify-content:center}button{padding:10px}input{width:350px}</style></head><body><header></header><canvas></canvas><section><label>Entrance frame <input id="frame" type="range" min="0" max="100" value="0"><output>0%</output></label></section><section id="frames"></section><script type="module">
+import { IslandRenderer } from '../src/renderer.js';
+const renderer = new IslandRenderer(document.querySelector('canvas'),()=>{});
+const slider=document.querySelector('input'),output=document.querySelector('output');
+function draw(value){slider.value=value;output.textContent=value+'%';renderer.drop=value/100;renderer.spring.value=1;renderer.spring.velocity=0;renderer.fade=1;renderer.intro=1;renderer.time=-2;renderer.render(0,{state:'listening',level:0,circle:true,elapsed:0});}
+for(const value of [8,20,35,50,65,80,100]){const button=document.createElement('button');button.textContent=value+'%';button.onclick=()=>draw(value);document.querySelector('#frames').append(button)}
+slider.oninput=()=>draw(Number(slider.value));draw(0);
+</script></body></html>

@@ -199,45 +199,29 @@ var fragmentShader = `
                 if (u_drop <= 0.0) { gl_FragColor = vec4(0.0); return; }
                 vec2 uv = vec2(vUv.x, 1.0 - vUv.y) * u_resolution;
                 float currentH = mix(41.0, 43.0, u_circle);
-                // One shared pinch-off phase keeps the droplet and bezel joined.
-                // The drop lengthens first; its width catches up as it detaches.
-                float release = 0.46;
-                float fall = smoothstep(0.02, 0.84, u_drop);
-                float expand = smoothstep(0.08, 0.74, u_drop);
-                float widen = smoothstep(0.30, 0.82, u_drop);
-                float grow = mix(0.28, 1.0, expand);
-                float stretch = mix(1.12, 1.0, widen);
-                // Proportions are relative to the orb radius, not fixed screen pixels.
-                float pullLength = currentH * 0.45 * sin(smoothstep(0.0, 0.84, u_drop) * PI);
-                float topEdge = mix(-currentH * 0.42, u_top, fall) + pullLength;
-                float bounce = sin(smoothstep(0.52, 1.0, u_drop) * PI) * 5.5;
-                float centerY = topEdge + currentH * grow * stretch + bounce;
-                vec2 p = uv - vec2(72.0, centerY);
-                p /= grow;
-                p.y /= stretch;
-                // A narrow pear-shaped drop rounds out without a scale bounce.
-                p.x /= mix(0.55, 1.0, widen) *
-                    (1.0 - 0.32 * (1.0 - widen) * smoothstep(0.0, 30.0, -p.y));
+                // Two simple surfaces: a rounded bezel bulge and a compact drop.
+                // Their smooth union pinches off as the bulge retracts.
+                float fall = smoothstep(0.0, 0.68, u_drop);
+                float grow = mix(0.35, 1.0, smoothstep(0.0, 0.82, u_drop));
+                float widen = smoothstep(0.24, 0.78, u_drop);
+                float topEdge = mix(-currentH * 0.70, u_top, fall);
+                float bounce = sin(smoothstep(0.52, 1.0, u_drop) * PI) * 4.0;
+                float centerY = topEdge + currentH * grow + bounce;
+                vec2 p = (uv - vec2(72.0, centerY)) / grow;
+                p.x /= mix(0.70, 1.0, widen);
                 float dOrb = getIslandSDF(p, u_progress) * grow;
                 float birth = smoothstep(0.0, 0.12, u_drop);
-                float pull = smoothstep(0.10, release, u_drop);
-                float pinch = 1.0 - smoothstep(0.30, release, u_drop);
-                float retract = 1.0 - smoothstep(release, 0.62, u_drop);
-                float narrow = mix(1.0, 0.55, pull);
-                float lipWidth = max(0.01, currentH * 1.10 * u_bulgeWidth * narrow * birth * retract);
-                // Follow the moving droplet tip so the two surfaces meet.
-                float lipDepth = max(0.01, mix(currentH * 0.14, max(currentH * 0.14, topEdge + currentH * 0.047),
-                    pull) * u_bulgeStretch * birth * retract);
+                float pull = smoothstep(0.10, 0.30, u_drop);
+                float retract = 1.0 - smoothstep(0.30, 0.50, u_drop);
+                float lipWidth = max(0.01, currentH * 1.10 * u_bulgeWidth *
+                    mix(1.0, 0.65, pull) * birth * retract);
+                float lipDepth = currentH * mix(0.18, 0.60, pull) *
+                    u_bulgeStretch * birth * retract;
                 float shoulder = max(0.0, 1.0 - pow((uv.x - 72.0) / lipWidth, 2.0));
                 float dLip = uv.y - lipDepth * shoulder * shoulder;
-                float neckEnd = max(centerY, 1.0);
-                float along = clamp(uv.y / neckEnd, 0.0, 1.0);
-                float neckWidth = (currentH * 0.058 + currentH * 0.93 * u_bulgeWidth * narrow *
-                    pow(1.0 - along, 2.8)) * pinch * birth;
-                float dNeck = max(abs(uv.x - 72.0) - neckWidth, uv.y - neckEnd);
-                float surface = pinch > 0.001 ? min(dNeck, dLip) : dLip;
-                float joined = smoothUnion(dOrb, surface, max(0.001, currentH * 0.163 * pinch));
-                float dIsland = u_drop < 0.62 ? joined : dOrb;
+                float dIsland = u_drop < 0.50
+                    ? smoothUnion(dOrb, dLip, max(0.001, currentH * 0.12 * retract))
+                    : dOrb;
 
                 float afwidth = length(vec2(dFdx(dIsland), dFdy(dIsland))) * 0.7071;
                 float edgeIsland = (1.0 - smoothstep(-afwidth, afwidth, dIsland));
@@ -644,15 +628,16 @@ var GlassRefraction = class {
     this.host = host;
     const id = `siri-glass-${Math.random().toString(36).slice(2)}`;
     const map = document.createElement("canvas");
-    map.width = map.height = 128;
+    const size = 256;
+    map.width = map.height = size;
     const context = map.getContext("2d");
     if (!context) return;
-    const pixels = context.createImageData(128, 128);
-    for (let y = 0; y < 128; y++) for (let x = 0; x < 128; x++) {
-      const nx = (x + 0.5) / 64 - 1, ny = (y + 0.5) / 64 - 1;
+    const pixels = context.createImageData(size, size);
+    for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) {
+      const nx = (x + 0.5) / (size / 2) - 1, ny = (y + 0.5) / (size / 2) - 1;
       const r = Math.hypot(nx, ny);
-      const bend = r < 1 ? Math.pow(r, 3) * Math.sqrt(1 - r) * 4 : 0;
-      const i = (y * 128 + x) * 4;
+      const bend = r < 1 ? Math.min(0.98, r * r * Math.sqrt(1 - r) * 3.6) : 0;
+      const i = (y * size + x) * 4;
       pixels.data.set([
         128 - nx / Math.max(r, 1e-3) * bend * 127,
         128 - ny / Math.max(r, 1e-3) * bend * 127,
@@ -667,7 +652,7 @@ var GlassRefraction = class {
     this.svg.setAttribute("height", "0");
     this.svg.setAttribute("aria-hidden", "true");
     this.svg.style.position = "absolute";
-    this.svg.innerHTML = `<defs><filter id="${id}" x="0%" y="0%" width="100%" height="100%" color-interpolation-filters="sRGB"><feImage width="100%" height="100%" preserveAspectRatio="none" result="lens"/><feDisplacementMap in="SourceGraphic" in2="lens" xChannelSelector="R" yChannelSelector="G" scale="18"/></filter></defs>`;
+    this.svg.innerHTML = `<defs><filter id="${id}" x="0%" y="0%" width="100%" height="100%" color-interpolation-filters="sRGB"><feImage width="100%" height="100%" preserveAspectRatio="none" result="lens"/><feDisplacementMap in="SourceGraphic" in2="lens" xChannelSelector="R" yChannelSelector="G" scale="36"/></filter></defs>`;
     this.svg.querySelector("feImage").setAttribute("href", map.toDataURL());
     this.displace = this.svg.querySelector("feDisplacementMap");
     this.el = document.createElement("div");
@@ -750,7 +735,7 @@ var Island = class {
       bottomGlow: number("--siri-island-bottom-glow", 0.8, 2),
       entrance: style.getPropertyValue("--siri-island-entrance").trim() !== "none"
     };
-    this.refraction = number("--siri-island-refraction", 18, 40);
+    this.refraction = number("--siri-island-refraction", 36, 80);
     this.el.dataset.shape = this.appearance.circle ? "circle" : "island";
     const next = readActivity(this.bar);
     const wasIdle = this.state === "idle";
