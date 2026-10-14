@@ -179,9 +179,11 @@ export const fragmentShader = `
                 float fall = smoothstep(0.0, 0.44, releasePhase);
                 float grow = mix(0.35, 1.0, fall);
                 float widen = smoothstep(0.36, 0.65, u_drop);
-                // Stop at the resting height; only width continues expanding
-                // after the drop separates. No clearance overshoot or bounce.
+                // A small positional settle after separation; width expansion
+                // stays monotonic and does not bounce.
                 float topEdge = mix(-currentH * 0.70, u_top, fall);
+                float settle = clamp((releasePhase - 0.40) / 0.40, 0.0, 1.0);
+                topEdge += currentH * 0.035 * pow(sin(3.14159265 * settle), 2.0);
                 float centerY = topEdge + currentH * grow;
                 vec2 p = (uv - vec2(72.0, centerY)) / grow;
                 p.x /= mix(0.70, 1.0, widen);
