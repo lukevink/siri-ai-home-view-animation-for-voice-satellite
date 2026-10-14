@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.10
+
+- Recoil the detached bezel bulge rapidly into a wide, shallow shoulder before settling flat.
+
 ## 0.2.9
 
 - Concentrate lens distortion around the rim while preserving the center, with stronger default displacement.
