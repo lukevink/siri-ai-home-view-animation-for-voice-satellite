@@ -184,13 +184,14 @@ export const fragmentShader = `
             }
 
             void main() {
+                if (u_drop <= 0.0) { gl_FragColor = vec4(0.0); return; }
                 vec2 uv = vec2(vUv.x, 1.0 - vUv.y) * u_resolution;
                 float currentH = mix(41.0, 43.0, u_circle);
                 // Extrude, pinch off, then settle: one continuous surface at the bezel.
                 float travel = smoothstep(0.0, 0.78, u_drop);
                 float settle = sin((u_drop - 0.78) * 18.0) *
                     (1.0 - smoothstep(0.78, 1.0, u_drop)) * 3.0 * step(0.78, u_drop);
-                float centerY = mix(-14.0, u_top + currentH + 5.0, travel) + settle;
+                float centerY = mix(-22.0, u_top + currentH + 5.0, travel) + settle;
                 float grow = mix(0.32, 1.0, smoothstep(0.08, 0.85, u_drop));
                 vec2 p = uv - vec2(72.0, centerY);
                 p /= grow;
@@ -198,13 +199,22 @@ export const fragmentShader = `
                 float dOrb = getIslandSDF(p, u_progress) * grow;
                 float neckEnd = max(centerY, 1.0);
                 float along = clamp(uv.y / neckEnd, 0.0, 1.0);
-                float pinch = 1.0 - smoothstep(0.32, 0.62, u_drop);
-                float neckWidth = (3.0 + 30.0 * pow(1.0 - along, 3.0)) * pinch;
+                float pinch = 1.0 - smoothstep(0.38, 0.72, u_drop);
+                float birth = smoothstep(0.0, 0.16, u_drop);
+                float neckWidth = (5.0 + 53.0 * pow(1.0 - along, 2.6)) * pinch * birth;
                 float dNeck = max(abs(uv.x - 72.0) - neckWidth, uv.y - neckEnd);
+                // A broad, shallow pool grows directly out of the screen edge.
+                // Its curved shoulders narrow into the stretching neck, then
+                // retract after pinch-off. Reversing u_drop rejoins that pool.
+                float lipWidth = max(0.01, 69.0 * birth * pinch);
+                float lipDepth = max(0.01, 15.0 * birth * pinch);
+                float dLip = (length(vec2((uv.x - 72.0) / lipWidth,
+                    (uv.y + 2.0) / lipDepth)) - 1.0) * lipDepth;
+                dNeck = min(dNeck, dLip);
                 float join = 10.0 * pinch;
                 float blend = max(join - abs(dOrb - dNeck), 0.0) / max(join, 0.001);
                 float joined = min(dOrb, dNeck) - blend * blend * join * 0.25;
-                float dIsland = u_drop < 0.62 ? joined : dOrb;
+                float dIsland = u_drop < 0.72 ? joined : dOrb;
 
                 float afwidth = length(vec2(dFdx(dIsland), dFdy(dIsland))) * 0.7071;
                 float edgeIsland = (1.0 - smoothstep(-afwidth, afwidth, dIsland));

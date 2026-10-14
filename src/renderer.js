@@ -135,8 +135,11 @@ export class IslandRenderer {
 
   render(delta, { state, level, reducedMotion = false, circle = false, opacity = 0.14, bottomGlow = 0.8, entrance = true, elapsed = delta }) {
     const active = state !== 'idle';
-    this.spring.target = active ? 1 : 0;
-    this.drop = Math.min(1, this.drop + elapsed / 0.95);
+    const liquidMotion = !reducedMotion && entrance;
+    this.drop = Math.max(0, Math.min(1, this.drop + (active ? 1 : -1) * elapsed / (active ? 0.95 : 0.8)));
+    // Keep the orb full-sized while it rises. Collapse only after it has
+    // merged into the bezel, rather than shrinking to a pill in mid-air.
+    this.spring.target = active || (liquidMotion && this.drop > 0) ? 1 : 0;
     this.thinking += (Number(state === 'processing') - this.thinking) * (1 - Math.exp(-delta * 8));
     this.float('u_drop', reducedMotion || !entrance ? 1 : this.drop);
     this.float('u_circle', Number(circle));
@@ -159,7 +162,7 @@ export class IslandRenderer {
     this.float('yScale', reducedMotion ? 0.11 : (state === 'processing' ? 0.065 : 0.085 + this.level * 0.13));
     this.float('glowIntensity', 1.15 + (reducedMotion ? 0 : this.level * 0.25));
     this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
-    return active || progress > 0.002 || Math.abs(this.spring.velocity) > 0.002;
+    return liquidMotion ? active || this.drop > 0 : active || progress > 0.002 || Math.abs(this.spring.velocity) > 0.002;
   }
 
   dispose() {

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.1
+
+- Return the orb to the bezel on dismissal, reversing the liquid drop.
+- Add wider black shoulders and a curved pool at the screen edge.
+- Resume smoothly when a new interaction interrupts the exit.
+
 ## 0.2.0
 
 - Renamed to Siri AI Home View Animation for Voice Satellite.

@@ -82,7 +82,7 @@ class Island {
     }
     if (next !== 'idle') {
       this.initRenderer();
-      if (wasIdle) this.renderer?.reset();
+      if (wasIdle && this.el.dataset.visible !== 'true') this.renderer?.reset();
       this.el.dataset.visible = 'true';
       this.start();
     } else if (this.motion.matches || this.failed) {
