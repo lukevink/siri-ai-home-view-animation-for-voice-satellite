@@ -1,4 +1,4 @@
-/*! Siri AI Home View Animation for Voice Satellite 0.2.10 — AGPL-3.0-only.
+/*! Siri AI Home View Animation for Voice Satellite 0.2.11 — AGPL-3.0-only.
  * Source: https://github.com/lukevink/siri-homeview-hass-animation
  * Shader adapted from neeldedkawala/ios-siri-animation (MIT).
 MIT License
@@ -358,10 +358,11 @@ var y=`/* Scoped to the opt-in host: other Voice Satellite skins stay untouched.
                     mix(mix(1.0, 0.65, pull), 1.0, reabsorb) * birth);
                 float lipDepth = currentH * mix(0.18, 0.60, pull) *
                     u_bulgeStretch * birth * retract;
-                float shoulder = max(0.0, 1.0 - pow((uv.x - 72.0) / lipWidth, 2.0));
-                float dLip = uv.y - lipDepth * shoulder * shoulder;
+                float shoulderX = min(1.0, abs(uv.x - 72.0) / lipWidth);
+                float shoulder = 0.5 + 0.5 * cos(3.14159265 * shoulderX);
+                float dLip = uv.y - lipDepth * shoulder;
                 float dIsland = u_drop < 0.74
-                    ? smoothUnion(dOrb, dLip, max(0.001, currentH * 0.12 * (1.0 - smoothstep(0.30, 0.44, u_drop))))
+                    ? smoothUnion(dOrb, dLip, max(0.001, currentH * 0.60 * (1.0 - smoothstep(0.20, 0.40, u_drop))))
                     : dOrb;
 
                 float afwidth = length(vec2(dFdx(dIsland), dFdy(dIsland))) * 0.7071;
