@@ -107,10 +107,11 @@ class Island {
       this.raf = requestAnimationFrame(next => this.tick(next));
       return;
     }
-    const delta = this.lastTime ? Math.min((time - this.lastTime) / 1000, .05) : 1 / 30;
+    const elapsed = this.lastTime ? (time - this.lastTime) / 1000 : 1 / 30;
+    const delta = Math.min(elapsed, .05);
     this.lastDraw = this.lastTime = time;
     const running = this.renderer.render(delta, {
-      ...this.appearance, state: this.state, level: audioLevel(this.bar, this.state), reducedMotion: this.motion.matches,
+      ...this.appearance, elapsed, state: this.state, level: audioLevel(this.bar, this.state), reducedMotion: this.motion.matches,
     });
     this.glass.update(this.refraction, this.state !== 'idle' &&
       (this.motion.matches || !this.appearance.entrance || this.renderer.drop >= 1));

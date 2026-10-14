@@ -133,10 +133,10 @@ export class IslandRenderer {
     this.thinking = 0;
   }
 
-  render(delta, { state, level, reducedMotion = false, circle = false, opacity = 0.14, bottomGlow = 0.8, entrance = true }) {
+  render(delta, { state, level, reducedMotion = false, circle = false, opacity = 0.14, bottomGlow = 0.8, entrance = true, elapsed = delta }) {
     const active = state !== 'idle';
     this.spring.target = active ? 1 : 0;
-    this.drop = Math.min(1, this.drop + delta / 0.95);
+    this.drop = Math.min(1, this.drop + elapsed / 0.95);
     this.thinking += (Number(state === 'processing') - this.thinking) * (1 - Math.exp(-delta * 8));
     this.float('u_drop', reducedMotion || !entrance ? 1 : this.drop);
     this.float('u_circle', Number(circle));

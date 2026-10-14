@@ -564,10 +564,10 @@ var IslandRenderer = class {
     this.drop = 0;
     this.thinking = 0;
   }
-  render(delta, { state, level, reducedMotion = false, circle = false, opacity = 0.14, bottomGlow = 0.8, entrance = true }) {
+  render(delta, { state, level, reducedMotion = false, circle = false, opacity = 0.14, bottomGlow = 0.8, entrance = true, elapsed = delta }) {
     const active = state !== "idle";
     this.spring.target = active ? 1 : 0;
-    this.drop = Math.min(1, this.drop + delta / 0.95);
+    this.drop = Math.min(1, this.drop + elapsed / 0.95);
     this.thinking += (Number(state === "processing") - this.thinking) * (1 - Math.exp(-delta * 8));
     this.float("u_drop", reducedMotion || !entrance ? 1 : this.drop);
     this.float("u_circle", Number(circle));
@@ -750,10 +750,12 @@ var Island = class {
       this.raf = requestAnimationFrame((next) => this.tick(next));
       return;
     }
-    const delta = this.lastTime ? Math.min((time - this.lastTime) / 1e3, 0.05) : 1 / 30;
+    const elapsed = this.lastTime ? (time - this.lastTime) / 1e3 : 1 / 30;
+    const delta = Math.min(elapsed, 0.05);
     this.lastDraw = this.lastTime = time;
     const running = this.renderer.render(delta, {
       ...this.appearance,
+      elapsed,
       state: this.state,
       level: audioLevel(this.bar, this.state),
       reducedMotion: this.motion.matches
