@@ -4,11 +4,11 @@ A liquid drop from the top bezel that settles into a transparent glass orb or ro
 
 **The original animation is by [Neel Dedkawala](https://github.com/neeldedkawala).** This project adapts the shader and spring animation from his MIT-licensed **[iOS Siri Animation](https://github.com/neeldedkawala/ios-siri-animation)**. Please visit and credit the original project. The Home Assistant bridge, packaging, and audio-reactive adaptation are additions here.
 
-![Home View orb with transparent glass over the demo dashboard](docs/home-view-preview.png)
+![Animated Home View orb: liquid bezel entrance, waves morphing into thinking dots, speech and bezel return](docs/home-view-preview.gif)
 
-Version 0.2 adds a liquid bezel entrance and return, a circular orb option, transparent glass with a white lower glow, and fluid thinking dots. Run the local preview below to compare both shapes and light/dark backgrounds.
+Version 0.2 adds a liquid bezel entrance and return, a circular orb option, transparent glass with a white lower glow, waves that morph into fluid thinking dots, and a rounded black caption panel. Run the local preview below to compare both shapes and light/dark backgrounds.
 
-**Status: experimental 0.2.1.** The skin has been used with Home Assistant and Android Kiosk Satellite. The bezel return is checked in the local preview and browser compatibility tests. Browser support and device performance can vary. This is an independent community extension, not an official Voice Satellite or Apple product.
+**Status: experimental 0.2.2.** The skin has been used with Home Assistant and Android Kiosk Satellite. The bezel return is checked in the local preview and browser compatibility tests. Browser support and device performance can vary. This is an independent community extension, not an official Voice Satellite or Apple product.
 
 ## What you install
 
@@ -18,7 +18,7 @@ It uses the same activity-bar classes and `--vs-audio-level` value that Voice Sa
 
 - Flows from the top edge, stretches into a liquid neck, detaches, and settles into a circle or rounded island.
 - Uses real canvas transparency in the lower hemisphere, a dark upper cap, a thin rim and a white bottom glow.
-- Merges and scatters five luminous fluid dots while thinking, then crossfades back to audio-reactive waves.
+- Contracts the voice curves into one white droplet, then opens into six smaller spinning liquid dots. The dots periodically gather and expand while thinking; the transition reverses into waves when speech resumes.
 - Reacts to local microphone and local speech playback levels when **Reactive activity bar** is enabled.
 - Uses gentler procedural motion while thinking, or when real audio levels are unavailable.
 - Stays attached to Voice Satellite's global UI across dashboard navigation.
@@ -37,12 +37,12 @@ The adapter was developed against Voice Satellite commit [`78f0f4b`](https://git
 This repository is designed for **HACS custom repository installation**, not yet included in the default HACS catalog.
 
 1. Open **HACS → ⋮ → Custom repositories**.
-2. Add `https://github.com/lukevink/siri-ai-home-view-animation-for-voice-satellite` with category **Dashboard**.
+2. Add `https://github.com/lukevink/siri-homeview-hass-animation` with category **Dashboard**.
 3. Download **Siri AI Home View Animation for Voice Satellite**.
 4. Check **Settings → Dashboards → Resources** for a JavaScript module resource pointing to:
 
    ```text
-   /hacsfiles/siri-ai-home-view-animation-for-voice-satellite/siri-island.js
+   /hacsfiles/siri-homeview-hass-animation/siri-island.js
    ```
 
    HACS may add this automatically. Add it only if it is missing. Advanced mode may be needed to see Resources.
@@ -72,7 +72,7 @@ Dashboard resources load with dashboards. For loading from **every Home Assistan
 ```yaml
 frontend:
   extra_module_url:
-    - /hacsfiles/siri-ai-home-view-animation-for-voice-satellite/siri-island.js
+    - /hacsfiles/siri-homeview-hass-animation/siri-island.js
 ```
 
 Merge this into an existing `frontend:` section rather than creating a duplicate key. Restart Home Assistant after changing YAML. The module is a singleton, so loading it through both routes does not create duplicate islands. See [Home Assistant's extra module documentation](https://www.home-assistant.io/integrations/frontend/#loading-extra-javascript).
@@ -80,7 +80,7 @@ Merge this into an existing `frontend:` section rather than creating a duplicate
 ## Manual installation
 
 1. Copy [`dist/siri-island.js`](dist/siri-island.js) to `/config/www/siri-island.js` on your Home Assistant server.
-2. Add `/local/siri-island.js?v=0.2.1` as a JavaScript module under Dashboard Resources, or use that URL under `frontend.extra_module_url` above.
+2. Add `/local/siri-island.js?v=0.2.2` as a JavaScript module under Dashboard Resources, or use that URL under `frontend.extra_module_url` above.
 3. Follow steps 5–7 from the HACS instructions.
 
 No Python component, card YAML, or access token is required. Keep the copyright/license banner in the distributed JavaScript file intact.
@@ -104,7 +104,7 @@ The lower glass is genuinely transparent to the dashboard. A separate SVG backdr
 
 ### Updating from Siri Island 0.1
 
-The repository was renamed from `lukevink/siriAI-voicesatellite`. GitHub redirects the old repository URL. Existing HACS installations may retain `/hacsfiles/siriAI-voicesatellite/siri-island.js`; keep the resource path actually provided by HACS rather than changing it blindly. New installations use the new repository name shown above. Reload the dashboard after updating, to get the new circular orb. Set `--siri-island-shape: island` in a browser's Custom CSS to retain the old rounded shape.
+The repository was renamed from `lukevink/siriAI-voicesatellite` and briefly used `lukevink/siri-ai-home-view-animation-for-voice-satellite`. GitHub redirects the previous repository URLs. Existing HACS installations may retain `/hacsfiles/siriAI-voicesatellite/siri-island.js` or `/hacsfiles/siri-ai-home-view-animation-for-voice-satellite/siri-island.js`; keep the resource path actually provided by HACS rather than changing it blindly. New installations use the new repository name shown above. Reload the dashboard after updating, to get the new circular orb. Set `--siri-island-shape: island` in a browser's Custom CSS to retain the old rounded shape.
 
 When TTS is played on a remote speaker, Voice Satellite does not expose that speaker's audio levels to this browser. The skin still animates, but its movement is procedural rather than synchronized with remote audio. A wake chime or delay can also use an upstream synthetic level; the extension displays the signal it receives.
 

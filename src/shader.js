@@ -155,32 +155,21 @@ export const fragmentShader = `
                 return min(a, b) - h * h * k * 0.25;
             }
 
-            // Original implementation; visual inspiration: 40973894's Siri Wave / Fluid Dots.
-            vec3 fluidDots(vec2 p, float time) {
-                float t = -time * 0.65;
-                float gather = 0.5 + 0.5 * sin(t * 0.85);
-                float distanceField = 10.0;
-                vec3 tint = vec3(0.0);
-                float weight = 0.0;
-                for (int i = 0; i < 5; i++) {
-                    float f = float(i);
-                    float angle = f * 1.256637 + t * 0.45;
-                    float radius = mix(0.12, 0.40, gather) + 0.035 * sin(t * 1.7 + f);
-                    vec2 center = vec2(cos(angle), sin(angle)) * radius;
-                    center.y *= 0.72;
-                    float size = 0.105 + 0.025 * sin(t * 1.3 + f * 2.0);
-                    float d = length(p - center) - size;
-                    distanceField = smoothUnion(distanceField, d, 0.18);
-                    float w = exp(-length(p - center) * 9.0);
-                    vec3 c = 0.55 + 0.45 * cos(vec3(0.0, 2.1, 4.2) + f * 1.25 + t * 0.25);
-                    tint += c * w;
-                    weight += w;
-                }
-                tint /= max(weight, 0.001);
-                float core = 1.0 - smoothstep(-0.025, 0.018, distanceField);
-                float glow = exp(-max(distanceField, 0.0) * 20.0) * 0.22;
-                float edge = exp(-abs(distanceField) * 65.0);
-                return mix(tint, vec3(1.0), 0.65) * core + tint * glow + vec3(0.3) * edge;
+            // Original motion; visual inspiration: 40973894's Siri Wave / Fluid Dots.
+            float dotSpread(float time) {
+                // Six droplets periodically rejoin at the center before opening.
+                return 1.0 - smoothstep(0.55, 1.0, 0.5 + 0.5 * sin(-time * 0.85 * 0.85));
+            }
+
+            vec2 dotCenter(float index, float time) {
+                float t = -time * 0.85;
+                float angle = index * (PI / 3.0) + t * 0.65;
+                float radius = 0.40 + 0.025 * sin(t * 1.7 + index);
+                return vec2(cos(angle), sin(angle) * 0.72) * radius * 43.0;
+            }
+
+            float dotSize(float index, float time) {
+                return (0.080 + 0.018 * sin(-time * 0.85 * 1.3 + index * 2.0)) * 43.0;
             }
 
             void main() {
@@ -289,52 +278,64 @@ export const fragmentShader = `
                     float edgeZone = clamp(1.0 - (distFromBorder / max(u_waveEdgeBand, 1.0)), 0.0, 1.0);
                     float edgeMask = pow(edgeZone, u_wavePower);
 
+                    // Finish contracting all curves into one droplet, hold it
+                    // briefly, then separate into six orbiting droplets. The
+                    // same stages reverse continuously when speech resumes.
+                    float morph = smoothstep(0.0, 0.44, u_thinking);
+                    float spread = smoothstep(0.58, 1.0, u_thinking) * dotSpread(u_time);
+                    float liquidField = 10000.0;
+                    vec3 liquidTint = vec3(0.0);
+                    float tintWeight = 0.0;
+
                     for (int i = 0; i < 6; i++) {
                         if (i >= activeWaves) break;
 
                         float numW = max(float(activeWaves - 1), 1.0);
                         float staggerStart = (float(i) / numW) * 0.42;
-                        float staggerDuration = 0.58;
-                        float rawWaveProg = clamp((u_waveIntro - staggerStart) / staggerDuration, 0.0, 1.0);
+                        float rawWaveProg = clamp((u_waveIntro - staggerStart) / 0.58, 0.0, 1.0);
                         float waveProgress = rawWaveProg * rawWaveProg * (3.0 - 2.0 * rawWaveProg);
-
-                        float dispersionOffset = (float(i) - 1.5) * (u_waveDispersion * 0.25);
+                        float dispersionOffset = (float(i) - 2.0) * (u_waveDispersion * 0.25);
                         float waveDispMag = (edgeZone * u_waveRefract * 4.0) + (dispersionOffset * edgeMask);
-
                         vec2 waveOffset = norm2D * (waveDispMag * edgeMask * u_progress);
-                        vec2 pWave = p - waveOffset;
 
-                        vec2 wp = vec2(pWave.x, pWave.y + 0.5 * u_progress) / currentW;
+                        // The curved capsule first becomes a centered circle;
+                        // only then does its center move to an orbit position.
+                        vec2 center = dotCenter(float(i), u_time) * spread;
+                        vec2 pWave = p - waveOffset * (1.0 - morph) - center;
+                        float contraction = max(0.001, 1.0 - morph);
+                        float span = currentW * spindleWidth * 0.5 * (1.0 - morph);
+                        vec2 wp = vec2(pWave.x / contraction,
+                            pWave.y + 0.5 * u_progress * (1.0 - morph)) / currentW;
                         float nx = (wp.x / spindleWidth) + 0.5;
+                        float envelope = pow(max(sin(clamp(nx, 0.0, 1.0) * PI), 0.0), pinTaper);
+                        float eFade = max(edgeFade, 0.001);
+                        float fadeMask = smoothstep(0.0, eFade, nx) * (1.0 - smoothstep(1.0 - eFade, 1.0, nx));
+                        float baseAngle = clamp(wp.x, -spindleWidth * 0.5, spindleWidth * 0.5) * xScale;
+                        float dynamicHarmonic = 1.0 + 0.12 * sin(u_time * 1.5 + float(i) * 1.3);
+                        float targetAmp = ampWeights[i] * dynamicHarmonic;
+                        float amp = mix(u_introStartAmp, targetAmp, waveProgress) * yScale * envelope;
+                        float ph = phaseDistance * phWeights[i] * waveProgress;
+                        float waveY = sin(baseAngle + u_time + ph) * amp * (1.0 - morph);
+                        float dist = abs(wp.y + waveY);
+                        float thickMult = mix(1.0, thickWeights[i], waveProgress);
+                        float currentThickness = lineThickness * envelope * thickMult;
 
                         if (nx > 0.0 && nx < 1.0) {
-                            float envelope = pow(sin(nx * PI), pinTaper);
-                            float eFade = max(edgeFade, 0.001);
-                            float fadeMask = smoothstep(0.0, eFade, nx) * (1.0 - smoothstep(1.0 - eFade, 1.0, nx));
-
-                            float baseAngle = wp.x * xScale;
-                            float dynamicHarmonic = 1.0 + 0.12 * sin(u_time * 1.5 + float(i) * 1.3);
-                            float targetAmp = ampWeights[i] * dynamicHarmonic;
-
-                            float currentYScale = yScale * envelope;
-                            float amp = mix(u_introStartAmp, targetAmp, waveProgress) * currentYScale;
-                            float ph = phaseDistance * phWeights[i] * waveProgress;
-
-                            float waveY = sin(baseAngle + u_time + ph) * amp;
-                            float dist = abs(wp.y + waveY);
-
-                            float targetThickMult = thickWeights[i];
-                            float thickMult = mix(1.0, targetThickMult, waveProgress);
-                            float currentThickness = lineThickness * envelope * thickMult;
-
                             float w = pow(clamp(currentThickness / max(dist + currentThickness * 0.32, 0.00001), 0.0, 1.0), glowFalloff);
                             w *= fillOpacity;
-
                             waveAccum += w * uColors[i] * fadeMask;
                             totalDensity += w * fadeMask;
-
                             waveIntersectCount += (1.0 - smoothstep(0.0, max(currentThickness * 2.2, 0.00001), dist));
                         }
+
+                        float radius = mix(currentThickness * currentW,
+                            mix(4.5, dotSize(float(i), u_time), spread), morph);
+                        float curveDistance = length(vec2(max(abs(pWave.x) - span, 0.0),
+                            (wp.y + waveY) * currentW)) - radius;
+                        liquidField = smoothUnion(liquidField, curveDistance, mix(1.4, 4.7, spread));
+                        float tint = exp(-length(pWave) * 0.2);
+                        liquidTint += uColors[i] * tint;
+                        tintWeight += tint;
                     }
 
                     if (totalDensity > hotCoreThreshold && waveIntersectCount >= 2.6) {
@@ -342,7 +343,13 @@ export const fragmentShader = `
                         waveAccum = mix(waveAccum, vec3(1.0) * hotCoreIntensity, whiteFactor * 0.85);
                     }
 
-                    accumulatedWave = waveAccum * glowIntensity * u_waveFade;
+                    liquidTint /= max(tintWeight, 0.001);
+                    float core = 1.0 - smoothstep(-0.9, 0.8, liquidField);
+                    float glow = exp(-max(liquidField, 0.0) * 0.5) * 0.14;
+                    float liquidEdge = exp(-abs(liquidField) * 1.5) * 0.1;
+                    vec3 liquidLight = mix(liquidTint, vec3(1.0), 0.92) * core + liquidTint * glow + liquidEdge;
+                    accumulatedWave = mix(waveAccum * glowIntensity, liquidLight,
+                        smoothstep(0.05, 0.55, morph)) * u_waveFade;
                 }
 
                 // A transmissive lower hemisphere, a dark upper cap and white caustic.
@@ -353,7 +360,7 @@ export const fragmentShader = `
                 float horizon = exp(-pow((p.y - 4.0 + 3.0 * cos(p.x / 28.0)) / 1.9, 2.0)) *
                     exp(-pow(p.x / 37.0, 4.0));
                 float sheen = (rim * 0.75 + bottomLight * u_bottomGlow + horizon * 0.18) * u_progress;
-                vec3 lights = accumulatedWave * (1.0 - u_thinking) + fluidDots(p / 43.0, u_time) * u_thinking * u_waveFade;
+                vec3 lights = accumulatedWave;
                 lights += vec3(1.0, 0.97, 0.93) * sheen;
                 float lightAlpha = clamp(max(max(lights.r, lights.g), lights.b), 0.0, 1.0);
                 float alpha = max(bodyAlpha, lightAlpha);

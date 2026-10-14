@@ -1,5 +1,5 @@
-/*! Siri AI Home View Animation for Voice Satellite 0.2.1 — AGPL-3.0-only.
- * Source: https://github.com/lukevink/siri-ai-home-view-animation-for-voice-satellite
+/*! Siri AI Home View Animation for Voice Satellite 0.2.2 — AGPL-3.0-only.
+ * Source: https://github.com/lukevink/siri-homeview-hass-animation
  * Shader adapted from neeldedkawala/ios-siri-animation (MIT).
 MIT License
 
@@ -36,6 +36,43 @@ var x=`/* Scoped to the opt-in host: other Voice Satellite skins stay untouched.
 #voice-satellite-ui.siri-island-enabled .vs-blur-overlay {
   backdrop-filter: blur(var(--siri-island-backdrop-blur, 2px));
   -webkit-backdrop-filter: blur(var(--siri-island-backdrop-blur, 2px));
+  background-image: linear-gradient(to top, rgba(0,0,0,.94), rgba(0,0,0,.64) 18%, transparent 54%) !important;
+}
+#voice-satellite-ui.siri-island-enabled .vs-chat-msg {
+  color: #fff !important;
+  font-weight: 300 !important;
+  font-size: calc(clamp(18px, 2.4vw, 30px) * var(--vs-text-scale, 1));
+  text-shadow: 0 2px 12px rgba(0,0,0,.5);
+  max-width: 100%;
+  text-align: left;
+  align-self: stretch;
+}
+#voice-satellite-ui.siri-island-enabled .vs-chat-container {
+  padding: clamp(22px, 3.5vw, 38px);
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: clamp(28px, 4vw, 48px);
+  background: radial-gradient(ellipse at 50% 112%, rgba(255,247,231,.24), transparent 40%),
+    linear-gradient(to bottom, #000 0%, rgba(0,0,0,.97) 68%, rgba(0,0,0,.72) 100%);
+  backdrop-filter: blur(12px) saturate(115%);
+  -webkit-backdrop-filter: blur(12px) saturate(115%);
+  box-shadow: inset 0 -1px 1px rgba(255,255,255,.65), inset 0 -12px 30px -25px #fff,
+    0 12px 48px rgba(0,0,0,.28);
+  max-height: min(58vh, 600px);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #ffffff45 transparent;
+}
+#voice-satellite-ui.siri-island-enabled .vs-chat-container:not(.announcement-mode) {
+  left: 16px;
+  right: 16px;
+  width: auto;
+  max-width: 900px;
+  margin-inline: auto;
+  bottom: max(24px, env(safe-area-inset-bottom, 0px)) !important;
+}
+#voice-satellite-ui.siri-island-enabled .vs-chat-msg.assistant {
+  max-height: none;
+  overflow-y: visible;
 }
 #voice-satellite-ui .siri-island {
   position: fixed;
@@ -119,7 +156,7 @@ var x=`/* Scoped to the opt-in host: other Voice Satellite skins stay untouched.
   border-radius: 50%;
 }
 #voice-satellite-ui .siri-island canvas { position: relative; }
-`;var _=`
+`;var w=`
 #extension GL_OES_standard_derivatives : enable
 
             precision highp float;
@@ -273,32 +310,21 @@ var x=`/* Scoped to the opt-in host: other Voice Satellite skins stay untouched.
                 return min(a, b) - h * h * k * 0.25;
             }
 
-            // Original implementation; visual inspiration: 40973894's Siri Wave / Fluid Dots.
-            vec3 fluidDots(vec2 p, float time) {
-                float t = -time * 0.65;
-                float gather = 0.5 + 0.5 * sin(t * 0.85);
-                float distanceField = 10.0;
-                vec3 tint = vec3(0.0);
-                float weight = 0.0;
-                for (int i = 0; i < 5; i++) {
-                    float f = float(i);
-                    float angle = f * 1.256637 + t * 0.45;
-                    float radius = mix(0.12, 0.40, gather) + 0.035 * sin(t * 1.7 + f);
-                    vec2 center = vec2(cos(angle), sin(angle)) * radius;
-                    center.y *= 0.72;
-                    float size = 0.105 + 0.025 * sin(t * 1.3 + f * 2.0);
-                    float d = length(p - center) - size;
-                    distanceField = smoothUnion(distanceField, d, 0.18);
-                    float w = exp(-length(p - center) * 9.0);
-                    vec3 c = 0.55 + 0.45 * cos(vec3(0.0, 2.1, 4.2) + f * 1.25 + t * 0.25);
-                    tint += c * w;
-                    weight += w;
-                }
-                tint /= max(weight, 0.001);
-                float core = 1.0 - smoothstep(-0.025, 0.018, distanceField);
-                float glow = exp(-max(distanceField, 0.0) * 20.0) * 0.22;
-                float edge = exp(-abs(distanceField) * 65.0);
-                return mix(tint, vec3(1.0), 0.65) * core + tint * glow + vec3(0.3) * edge;
+            // Original motion; visual inspiration: 40973894's Siri Wave / Fluid Dots.
+            float dotSpread(float time) {
+                // Six droplets periodically rejoin at the center before opening.
+                return 1.0 - smoothstep(0.55, 1.0, 0.5 + 0.5 * sin(-time * 0.85 * 0.85));
+            }
+
+            vec2 dotCenter(float index, float time) {
+                float t = -time * 0.85;
+                float angle = index * (PI / 3.0) + t * 0.65;
+                float radius = 0.40 + 0.025 * sin(t * 1.7 + index);
+                return vec2(cos(angle), sin(angle) * 0.72) * radius * 43.0;
+            }
+
+            float dotSize(float index, float time) {
+                return (0.080 + 0.018 * sin(-time * 0.85 * 1.3 + index * 2.0)) * 43.0;
             }
 
             void main() {
@@ -407,52 +433,64 @@ var x=`/* Scoped to the opt-in host: other Voice Satellite skins stay untouched.
                     float edgeZone = clamp(1.0 - (distFromBorder / max(u_waveEdgeBand, 1.0)), 0.0, 1.0);
                     float edgeMask = pow(edgeZone, u_wavePower);
 
+                    // Finish contracting all curves into one droplet, hold it
+                    // briefly, then separate into six orbiting droplets. The
+                    // same stages reverse continuously when speech resumes.
+                    float morph = smoothstep(0.0, 0.44, u_thinking);
+                    float spread = smoothstep(0.58, 1.0, u_thinking) * dotSpread(u_time);
+                    float liquidField = 10000.0;
+                    vec3 liquidTint = vec3(0.0);
+                    float tintWeight = 0.0;
+
                     for (int i = 0; i < 6; i++) {
                         if (i >= activeWaves) break;
 
                         float numW = max(float(activeWaves - 1), 1.0);
                         float staggerStart = (float(i) / numW) * 0.42;
-                        float staggerDuration = 0.58;
-                        float rawWaveProg = clamp((u_waveIntro - staggerStart) / staggerDuration, 0.0, 1.0);
+                        float rawWaveProg = clamp((u_waveIntro - staggerStart) / 0.58, 0.0, 1.0);
                         float waveProgress = rawWaveProg * rawWaveProg * (3.0 - 2.0 * rawWaveProg);
-
-                        float dispersionOffset = (float(i) - 1.5) * (u_waveDispersion * 0.25);
+                        float dispersionOffset = (float(i) - 2.0) * (u_waveDispersion * 0.25);
                         float waveDispMag = (edgeZone * u_waveRefract * 4.0) + (dispersionOffset * edgeMask);
-
                         vec2 waveOffset = norm2D * (waveDispMag * edgeMask * u_progress);
-                        vec2 pWave = p - waveOffset;
 
-                        vec2 wp = vec2(pWave.x, pWave.y + 0.5 * u_progress) / currentW;
+                        // The curved capsule first becomes a centered circle;
+                        // only then does its center move to an orbit position.
+                        vec2 center = dotCenter(float(i), u_time) * spread;
+                        vec2 pWave = p - waveOffset * (1.0 - morph) - center;
+                        float contraction = max(0.001, 1.0 - morph);
+                        float span = currentW * spindleWidth * 0.5 * (1.0 - morph);
+                        vec2 wp = vec2(pWave.x / contraction,
+                            pWave.y + 0.5 * u_progress * (1.0 - morph)) / currentW;
                         float nx = (wp.x / spindleWidth) + 0.5;
+                        float envelope = pow(max(sin(clamp(nx, 0.0, 1.0) * PI), 0.0), pinTaper);
+                        float eFade = max(edgeFade, 0.001);
+                        float fadeMask = smoothstep(0.0, eFade, nx) * (1.0 - smoothstep(1.0 - eFade, 1.0, nx));
+                        float baseAngle = clamp(wp.x, -spindleWidth * 0.5, spindleWidth * 0.5) * xScale;
+                        float dynamicHarmonic = 1.0 + 0.12 * sin(u_time * 1.5 + float(i) * 1.3);
+                        float targetAmp = ampWeights[i] * dynamicHarmonic;
+                        float amp = mix(u_introStartAmp, targetAmp, waveProgress) * yScale * envelope;
+                        float ph = phaseDistance * phWeights[i] * waveProgress;
+                        float waveY = sin(baseAngle + u_time + ph) * amp * (1.0 - morph);
+                        float dist = abs(wp.y + waveY);
+                        float thickMult = mix(1.0, thickWeights[i], waveProgress);
+                        float currentThickness = lineThickness * envelope * thickMult;
 
                         if (nx > 0.0 && nx < 1.0) {
-                            float envelope = pow(sin(nx * PI), pinTaper);
-                            float eFade = max(edgeFade, 0.001);
-                            float fadeMask = smoothstep(0.0, eFade, nx) * (1.0 - smoothstep(1.0 - eFade, 1.0, nx));
-
-                            float baseAngle = wp.x * xScale;
-                            float dynamicHarmonic = 1.0 + 0.12 * sin(u_time * 1.5 + float(i) * 1.3);
-                            float targetAmp = ampWeights[i] * dynamicHarmonic;
-
-                            float currentYScale = yScale * envelope;
-                            float amp = mix(u_introStartAmp, targetAmp, waveProgress) * currentYScale;
-                            float ph = phaseDistance * phWeights[i] * waveProgress;
-
-                            float waveY = sin(baseAngle + u_time + ph) * amp;
-                            float dist = abs(wp.y + waveY);
-
-                            float targetThickMult = thickWeights[i];
-                            float thickMult = mix(1.0, targetThickMult, waveProgress);
-                            float currentThickness = lineThickness * envelope * thickMult;
-
                             float w = pow(clamp(currentThickness / max(dist + currentThickness * 0.32, 0.00001), 0.0, 1.0), glowFalloff);
                             w *= fillOpacity;
-
                             waveAccum += w * uColors[i] * fadeMask;
                             totalDensity += w * fadeMask;
-
                             waveIntersectCount += (1.0 - smoothstep(0.0, max(currentThickness * 2.2, 0.00001), dist));
                         }
+
+                        float radius = mix(currentThickness * currentW,
+                            mix(4.5, dotSize(float(i), u_time), spread), morph);
+                        float curveDistance = length(vec2(max(abs(pWave.x) - span, 0.0),
+                            (wp.y + waveY) * currentW)) - radius;
+                        liquidField = smoothUnion(liquidField, curveDistance, mix(1.4, 4.7, spread));
+                        float tint = exp(-length(pWave) * 0.2);
+                        liquidTint += uColors[i] * tint;
+                        tintWeight += tint;
                     }
 
                     if (totalDensity > hotCoreThreshold && waveIntersectCount >= 2.6) {
@@ -460,7 +498,13 @@ var x=`/* Scoped to the opt-in host: other Voice Satellite skins stay untouched.
                         waveAccum = mix(waveAccum, vec3(1.0) * hotCoreIntensity, whiteFactor * 0.85);
                     }
 
-                    accumulatedWave = waveAccum * glowIntensity * u_waveFade;
+                    liquidTint /= max(tintWeight, 0.001);
+                    float core = 1.0 - smoothstep(-0.9, 0.8, liquidField);
+                    float glow = exp(-max(liquidField, 0.0) * 0.5) * 0.14;
+                    float liquidEdge = exp(-abs(liquidField) * 1.5) * 0.1;
+                    vec3 liquidLight = mix(liquidTint, vec3(1.0), 0.92) * core + liquidTint * glow + liquidEdge;
+                    accumulatedWave = mix(waveAccum * glowIntensity, liquidLight,
+                        smoothstep(0.05, 0.55, morph)) * u_waveFade;
                 }
 
                 // A transmissive lower hemisphere, a dark upper cap and white caustic.
@@ -471,7 +515,7 @@ var x=`/* Scoped to the opt-in host: other Voice Satellite skins stay untouched.
                 float horizon = exp(-pow((p.y - 4.0 + 3.0 * cos(p.x / 28.0)) / 1.9, 2.0)) *
                     exp(-pow(p.x / 37.0, 4.0));
                 float sheen = (rim * 0.75 + bottomLight * u_bottomGlow + horizon * 0.18) * u_progress;
-                vec3 lights = accumulatedWave * (1.0 - u_thinking) + fluidDots(p / 43.0, u_time) * u_thinking * u_waveFade;
+                vec3 lights = accumulatedWave;
                 lights += vec3(1.0, 0.97, 0.93) * sheen;
                 float lightAlpha = clamp(max(max(lights.r, lights.g), lights.b), 0.0, 1.0);
                 float alpha = max(bodyAlpha, lightAlpha);
@@ -482,11 +526,11 @@ var x=`/* Scoped to the opt-in host: other Voice Satellite skins stay untouched.
                 alpha = mix(1.0, alpha, orbMask * glassReveal);
                 gl_FragColor = vec4(color, edgeIsland * alpha);
             }
-        `;function w(n){return n?.classList.contains("visible")?n.classList.contains("error-mode")?"error":n.classList.contains("processing")?"processing":n.classList.contains("speaking")?"speaking":n.classList.contains("listening")?"listening":"connecting":"idle"}function y(n,e){if(!["listening","speaking"].includes(e)||!n?.classList.contains("reactive"))return 0;let i=Number.parseFloat(n.style.getPropertyValue("--vs-audio-level"));return Number.isFinite(i)?Math.max(0,Math.min(i,1)):0}var f=class{value=0;velocity=0;target=0;update(e){let i=Math.min(Math.max(e,0),.033)/4;for(let t=0;t<4;t++)this.velocity+=(-450*(this.value-this.target)-28*this.velocity)*i,this.value+=this.velocity*i;return Math.abs(this.velocity)<1e-4&&Math.abs(this.value-this.target)<1e-4&&(this.value=this.target,this.velocity=0),this.value}};var S=`
+        `;function _(n){return n?.classList.contains("visible")?n.classList.contains("error-mode")?"error":n.classList.contains("processing")?"processing":n.classList.contains("speaking")?"speaking":n.classList.contains("listening")?"listening":"connecting":"idle"}function y(n,e){if(!["listening","speaking"].includes(e)||!n?.classList.contains("reactive"))return 0;let i=Number.parseFloat(n.style.getPropertyValue("--vs-audio-level"));return Number.isFinite(i)?Math.max(0,Math.min(i,1)):0}var f=class{value=0;velocity=0;target=0;update(e){let i=Math.min(Math.max(e,0),.033)/4;for(let t=0;t<4;t++)this.velocity+=(-450*(this.value-this.target)-28*this.velocity)*i,this.value+=this.velocity*i;return Math.abs(this.velocity)<1e-4&&Math.abs(this.value-this.target)<1e-4&&(this.value=this.target,this.velocity=0),this.value}};var S=`
   attribute vec2 position;
   varying vec2 vUv;
   void main() {
     vUv = position * 0.5 + 0.5;
     gl_Position = vec4(position, 0.0, 1.0);
   }
-`,D=["002fff","00ffde","fa1f1f","ff930d","9900ff","00ff88"],E={u_introStartAmp:.2,u_scaleRatio:3.8,u_bezelWidth:58,u_glassThickness:31,u_ior:3.05,u_dispersionScale:2,u_surfaceCurvature:8,u_absorption:0,u_showBackground:1,u_topMorphUp:4.5,u_waveRefract:6.3,u_waveDispersion:15,u_waveEdgeBand:4.5,u_wavePower:1.55,u_bottomRimIntensity:.97,u_bottomRimWidth:1.4,xScale:1.6,yScale:.11,phaseDistance:-4.1,lineThickness:.056,pinTaper:2.8,spindleWidth:2.3,glowFalloff:1.5,glowIntensity:1.15,edgeFade:.42,hotCoreThreshold:7.2,hotCoreIntensity:3.2,fillOpacity:1,u_bgCrossFade:0},p=class{constructor(e,i){this.canvas=e,this.spring=new f,this.time=0,this.fade=0,this.intro=0,this.level=0,this.drop=0,this.thinking=0,this.locations=new Map,this.shaders=[];let t=e.getContext("webgl",{alpha:!0,antialias:!0,premultipliedAlpha:!1,depth:!1,stencil:!1,powerPreference:"low-power"});if(!t)throw new Error("WebGL unavailable");this.gl=t,this.contextLost=a=>{a.preventDefault(),i()},e.addEventListener("webglcontextlost",this.contextLost);try{if(!t.getExtension("OES_standard_derivatives"))throw new Error("Shader derivatives unavailable");this.program=t.createProgram();for(let[s,o]of[[t.VERTEX_SHADER,S],[t.FRAGMENT_SHADER,_]]){let r=t.createShader(s);if(this.shaders.push(r),t.shaderSource(r,o),t.compileShader(r),!t.getShaderParameter(r,t.COMPILE_STATUS))throw new Error(t.getShaderInfoLog(r));t.attachShader(this.program,r)}if(t.linkProgram(this.program),!t.getProgramParameter(this.program,t.LINK_STATUS))throw new Error(t.getProgramInfoLog(this.program));t.useProgram(this.program),this.buffer=t.createBuffer(),t.bindBuffer(t.ARRAY_BUFFER,this.buffer),t.bufferData(t.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]),t.STATIC_DRAW);let a=t.getAttribLocation(this.program,"position");t.enableVertexAttribArray(a),t.vertexAttribPointer(a,2,t.FLOAT,!1,0,0);for(let[s,o]of Object.entries(E))this.float(s,o);t.uniform2f(this.location("u_resolution"),144,112),t.uniform4f(this.location("u_shapeParams"),53,41,.01,0),t.uniform3f(this.location("u_glassTint"),.94,.96,1),t.uniform1i(this.location("activeWaves"),4),t.uniform3fv(this.location("uColors[0]"),D.flatMap(s=>{let o=parseInt(s,16);return[(o>>16&255)/255,(o>>8&255)/255,(o&255)/255]})),this.createEnvironment(),this.resize()}catch(a){throw this.dispose(),a}}location(e){return this.locations.has(e)||this.locations.set(e,this.gl.getUniformLocation(this.program,e)),this.locations.get(e)}float(e,i){this.gl.uniform1f(this.location(e),i)}createEnvironment(){let e=this.gl,i=128,t=new Uint8Array(i*i*4);for(let a=0;a<i;a++)for(let s=0;s<i;s++){let o=s/i,r=a/i,l=15+90*Math.exp(-((o-.65)**2*10+(r-.75)**2*5)),h=(a*i+s)*4;t.set([l*.84,l*.94,l*1.07,255],h)}this.texture=e.createTexture(),e.activeTexture(e.TEXTURE0),e.bindTexture(e.TEXTURE_2D,this.texture),e.texImage2D(e.TEXTURE_2D,0,e.RGBA,i,i,0,e.RGBA,e.UNSIGNED_BYTE,t),e.texParameteri(e.TEXTURE_2D,e.TEXTURE_MIN_FILTER,e.LINEAR),e.texParameteri(e.TEXTURE_2D,e.TEXTURE_MAG_FILTER,e.LINEAR),e.texParameteri(e.TEXTURE_2D,e.TEXTURE_WRAP_S,e.CLAMP_TO_EDGE),e.texParameteri(e.TEXTURE_2D,e.TEXTURE_WRAP_T,e.CLAMP_TO_EDGE);for(let a of["u_bgTexture","u_bgTextureNext"])e.uniform1i(this.location(a),0);for(let a of["u_bgScale","u_bgNextScale"])e.uniform2f(this.location(a),1,1);for(let a of["u_bgOffset","u_bgNextOffset"])e.uniform2f(this.location(a),0,0)}resize(){let e=Math.min(window.devicePixelRatio||1,2),i=this.canvas.clientWidth||240,t=this.canvas.clientHeight||i*112/144;this.canvas.width=Math.round(i*e),this.canvas.height=Math.round(t*e),this.gl.viewport(0,0,this.canvas.width,this.canvas.height),this.gl.uniform2f(this.location("u_resolution"),144,t/i*144),this.float("u_top",Math.max(0,t/i*144-112))}reset(){this.spring.value=this.spring.velocity=this.fade=this.intro=this.time=this.level=this.drop=this.thinking=0,this.drop=0,this.thinking=0}render(e,{state:i,level:t,reducedMotion:a=!1,circle:s=!1,opacity:o=.14,bottomGlow:r=.8,entrance:l=!0,elapsed:h=e}){let c=i!=="idle",d=!a&&l;this.drop=Math.max(0,Math.min(1,this.drop+(c?1:-1)*h/(c?.95:.8))),this.spring.target=c||d&&this.drop>0?1:0,this.thinking+=(+(i==="processing")-this.thinking)*(1-Math.exp(-e*8)),this.float("u_drop",a||!l?1:this.drop),this.float("u_circle",Number(s)),this.float("u_bodyOpacity",o),this.float("u_bottomGlow",r),this.float("u_thinking",a?+(i==="processing"):this.thinking);let u=a?Number(c):this.spring.update(e);return this.level+=(t-this.level)*(1-Math.exp(-e*(t>this.level?18:7))),c&&u>.98?(this.fade=Math.min(1,this.fade+e/.3),this.intro=Math.min(1,this.intro+e/.65)):c||(this.fade=Math.max(0,this.fade-e/.16)),this.time-=e*(i==="processing"?1.2:2.7+this.level*1.6),this.float("u_progress",Math.max(0,Math.min(1.07,u))),this.float("u_waveFade",a?Number(c):this.fade),this.float("u_waveIntro",a?1:this.intro),this.float("u_time",a?-1.8:this.time),this.float("yScale",a?.11:i==="processing"?.065:.085+this.level*.13),this.float("glowIntensity",1.15+(a?0:this.level*.25)),this.gl.drawArrays(this.gl.TRIANGLES,0,6),d?c||this.drop>0:c||u>.002||Math.abs(this.spring.velocity)>.002}dispose(){let e=this.gl;this.canvas.removeEventListener("webglcontextlost",this.contextLost);for(let i of this.shaders)e.deleteShader(i);this.buffer&&e.deleteBuffer(this.buffer),this.texture&&e.deleteTexture(this.texture),this.program&&e.deleteProgram(this.program),e.getExtension("WEBGL_lose_context")?.loseContext()}};var m=class{constructor(e){this.host=e;let i=`siri-glass-${Math.random().toString(36).slice(2)}`,t=document.createElement("canvas");t.width=t.height=128;let a=t.getContext("2d");if(!a)return;let s=a.createImageData(128,128);for(let r=0;r<128;r++)for(let l=0;l<128;l++){let h=(l+.5)/64-1,c=(r+.5)/64-1,d=Math.hypot(h,c),u=d<1?Math.pow(d,3)*Math.sqrt(1-d)*4:0,k=(r*128+l)*4;s.data.set([128-h/Math.max(d,.001)*u*127,128-c/Math.max(d,.001)*u*127,128,255],k)}a.putImageData(s,0,0);let o="http://www.w3.org/2000/svg";this.svg=document.createElementNS(o,"svg"),this.svg.setAttribute("width","0"),this.svg.setAttribute("height","0"),this.svg.setAttribute("aria-hidden","true"),this.svg.style.position="absolute",this.svg.innerHTML=`<defs><filter id="${i}" x="0%" y="0%" width="100%" height="100%" color-interpolation-filters="sRGB"><feImage width="100%" height="100%" preserveAspectRatio="none" result="lens"/><feDisplacementMap in="SourceGraphic" in2="lens" xChannelSelector="R" yChannelSelector="G" scale="18"/></filter></defs>`,this.svg.querySelector("feImage").setAttribute("href",t.toDataURL()),this.displace=this.svg.querySelector("feDisplacementMap"),this.el=document.createElement("div"),this.el.className="siri-island-refraction",this.el.setAttribute("aria-hidden","true"),this.el.style.backdropFilter=`url(#${i})`,this.el.style.webkitBackdropFilter=`url(#${i})`,e.prepend(this.svg,this.el)}update(e,i){this.el&&(this.amount!==e&&(this.displace.setAttribute("scale",String(e)),this.amount=e),this.el.style.visibility=i&&e>0?"visible":"hidden")}};var v=Symbol.for("voice-satellite.siri-island"),M={idle:"",connecting:"Connecting",listening:"Listening",processing:"Thinking",speaking:"Speaking",error:"Check Voice Satellite"},g=class{constructor(e,i){this.ui=e,this.bar=i,this.state="idle",this.raf=0,this.lastTime=0,this.lastDraw=0,this.el=document.createElement("div"),this.el.className="siri-island",this.el.dataset.visible="false",this.el.innerHTML='<canvas aria-hidden="true"></canvas><div class="siri-island-fallback" aria-hidden="true"><i></i><i></i><i></i><i></i></div><span class="siri-island-label" role="status" aria-live="polite"></span>',this.glass=new m(this.el),this.canvas=this.el.querySelector("canvas"),this.label=this.el.querySelector(".siri-island-label"),e.append(this.el),e.classList.add("siri-island-enabled"),this.motion=matchMedia("(prefers-reduced-motion: reduce)"),this.change=()=>this.sync(),this.motion.addEventListener("change",this.change),document.addEventListener("visibilitychange",this.change),this.observer=new MutationObserver(this.change),this.observer.observe(i,{attributes:!0,attributeFilter:["class"]}),this.resizeObserver=new ResizeObserver(()=>{this.renderer?.resize(),this.state!=="idle"&&this.start()}),this.resizeObserver.observe(this.canvas),this.sync()}initRenderer(){if(!(this.renderer||this.failed))try{this.renderer=new p(this.canvas,()=>this.fallback()),this.el.dataset.renderer="webgl"}catch(e){console.warn("[Siri Island] Using static fallback:",e.message),this.fallback()}}fallback(){this.failed=!0,this.stop(),this.el.dataset.renderer="fallback",this.glass.update(0,!1)}sync(){let e=getComputedStyle(this.ui),i=(s,o,r=1)=>{let l=parseFloat(e.getPropertyValue(s));return Number.isFinite(l)?Math.max(0,Math.min(l,r)):o};this.appearance={circle:e.getPropertyValue("--siri-island-shape").trim()!=="island",opacity:i("--siri-island-glass-opacity",.14),bottomGlow:i("--siri-island-bottom-glow",.8,2),entrance:e.getPropertyValue("--siri-island-entrance").trim()!=="none"},this.refraction=i("--siri-island-refraction",18,40),this.el.dataset.shape=this.appearance.circle?"circle":"island";let t=w(this.bar),a=this.state==="idle";if(this.state=t,this.el.dataset.state=t,this.label.textContent=M[t],document.hidden){this.stop(),this.el.dataset.visible="false",this.glass.update(0,!1);return}t!=="idle"?(this.initRenderer(),a&&this.el.dataset.visible!=="true"&&this.renderer?.reset(),this.el.dataset.visible="true",this.start()):this.motion.matches||this.failed?(this.stop(),this.el.dataset.visible="false"):this.renderer&&this.start()}start(){this.raf||this.failed||!this.renderer||document.hidden||(this.lastTime=this.lastDraw=0,this.raf=requestAnimationFrame(e=>this.tick(e)))}tick(e){if(this.raf=0,document.hidden||this.failed)return;if(this.lastDraw&&e-this.lastDraw<30){this.raf=requestAnimationFrame(s=>this.tick(s));return}let i=this.lastTime?(e-this.lastTime)/1e3:1/30,t=Math.min(i,.05);this.lastDraw=this.lastTime=e;let a=this.renderer.render(t,{...this.appearance,elapsed:i,state:this.state,level:y(this.bar,this.state),reducedMotion:this.motion.matches});this.glass.update(this.refraction,this.state!=="idle"&&(this.motion.matches||!this.appearance.entrance||this.renderer.drop>=1)),a?this.motion.matches||(this.raf=requestAnimationFrame(s=>this.tick(s))):this.el.dataset.visible="false"}stop(){cancelAnimationFrame(this.raf),this.raf=0}dispose(){this.stop(),this.observer.disconnect(),this.resizeObserver.disconnect(),this.motion.removeEventListener("change",this.change),document.removeEventListener("visibilitychange",this.change),this.renderer?.dispose(),this.ui.classList.remove("siri-island-enabled"),this.el.remove()}};function b(){if(window[v])return window[v];let n=document.createElement("style");n.id="siri-island-styles",n.textContent=x,document.head.append(n);let e=null,i=!1,t=!1,a=()=>{if(i=!1,t)return;let h=document.getElementById("voice-satellite-ui"),c=h?.querySelector(".vs-rainbow-bar"),d=h&&getComputedStyle(h).getPropertyValue("--siri-island-enabled").trim()==="1";e&&(!d||e.ui!==h||e.bar!==c)&&(e.dispose(),e=null),d&&c&&!e?e=new g(h,c):e?.sync()},s=()=>{i||(i=!0,queueMicrotask(a))},o=new MutationObserver(s);o.observe(document.body,{childList:!0});let r=new MutationObserver(s);r.observe(document.head,{childList:!0,subtree:!0,characterData:!0});let l={version:"0.2.0",refresh:a,dispose(){t=!0,o.disconnect(),r.disconnect(),e?.dispose(),n.remove(),delete window[v]}};return window[v]=l,a(),l}document.body?b():document.addEventListener("DOMContentLoaded",b,{once:!0});
+`,W=["002fff","00ffde","fa1f1f","ff930d","9900ff","00ff88"],E={u_introStartAmp:.2,u_scaleRatio:3.8,u_bezelWidth:58,u_glassThickness:31,u_ior:3.05,u_dispersionScale:2,u_surfaceCurvature:8,u_absorption:0,u_showBackground:1,u_topMorphUp:4.5,u_waveRefract:6.3,u_waveDispersion:15,u_waveEdgeBand:4.5,u_wavePower:1.55,u_bottomRimIntensity:.97,u_bottomRimWidth:1.4,xScale:1.6,yScale:.11,phaseDistance:-4.1,lineThickness:.056,pinTaper:2.8,spindleWidth:2.3,glowFalloff:1.5,glowIntensity:1.15,edgeFade:.42,hotCoreThreshold:7.2,hotCoreIntensity:3.2,fillOpacity:1,u_bgCrossFade:0},p=class{constructor(e,i){this.canvas=e,this.spring=new f,this.time=0,this.fade=0,this.intro=0,this.level=0,this.drop=0,this.thinking=0,this.locations=new Map,this.shaders=[];let t=e.getContext("webgl",{alpha:!0,antialias:!0,premultipliedAlpha:!1,depth:!1,stencil:!1,powerPreference:"low-power"});if(!t)throw new Error("WebGL unavailable");this.gl=t,this.contextLost=a=>{a.preventDefault(),i()},e.addEventListener("webglcontextlost",this.contextLost);try{if(!t.getExtension("OES_standard_derivatives"))throw new Error("Shader derivatives unavailable");this.program=t.createProgram();for(let[s,o]of[[t.VERTEX_SHADER,S],[t.FRAGMENT_SHADER,w]]){let r=t.createShader(s);if(this.shaders.push(r),t.shaderSource(r,o),t.compileShader(r),!t.getShaderParameter(r,t.COMPILE_STATUS))throw new Error(t.getShaderInfoLog(r));t.attachShader(this.program,r)}if(t.linkProgram(this.program),!t.getProgramParameter(this.program,t.LINK_STATUS))throw new Error(t.getProgramInfoLog(this.program));t.useProgram(this.program),this.buffer=t.createBuffer(),t.bindBuffer(t.ARRAY_BUFFER,this.buffer),t.bufferData(t.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]),t.STATIC_DRAW);let a=t.getAttribLocation(this.program,"position");t.enableVertexAttribArray(a),t.vertexAttribPointer(a,2,t.FLOAT,!1,0,0);for(let[s,o]of Object.entries(E))this.float(s,o);t.uniform2f(this.location("u_resolution"),144,112),t.uniform4f(this.location("u_shapeParams"),53,41,.01,0),t.uniform3f(this.location("u_glassTint"),.94,.96,1),t.uniform1i(this.location("activeWaves"),6),t.uniform3fv(this.location("uColors[0]"),W.flatMap(s=>{let o=parseInt(s,16);return[(o>>16&255)/255,(o>>8&255)/255,(o&255)/255]})),this.createEnvironment(),this.resize()}catch(a){throw this.dispose(),a}}location(e){return this.locations.has(e)||this.locations.set(e,this.gl.getUniformLocation(this.program,e)),this.locations.get(e)}float(e,i){this.gl.uniform1f(this.location(e),i)}createEnvironment(){let e=this.gl,i=128,t=new Uint8Array(i*i*4);for(let a=0;a<i;a++)for(let s=0;s<i;s++){let o=s/i,r=a/i,l=15+90*Math.exp(-((o-.65)**2*10+(r-.75)**2*5)),h=(a*i+s)*4;t.set([l*.84,l*.94,l*1.07,255],h)}this.texture=e.createTexture(),e.activeTexture(e.TEXTURE0),e.bindTexture(e.TEXTURE_2D,this.texture),e.texImage2D(e.TEXTURE_2D,0,e.RGBA,i,i,0,e.RGBA,e.UNSIGNED_BYTE,t),e.texParameteri(e.TEXTURE_2D,e.TEXTURE_MIN_FILTER,e.LINEAR),e.texParameteri(e.TEXTURE_2D,e.TEXTURE_MAG_FILTER,e.LINEAR),e.texParameteri(e.TEXTURE_2D,e.TEXTURE_WRAP_S,e.CLAMP_TO_EDGE),e.texParameteri(e.TEXTURE_2D,e.TEXTURE_WRAP_T,e.CLAMP_TO_EDGE);for(let a of["u_bgTexture","u_bgTextureNext"])e.uniform1i(this.location(a),0);for(let a of["u_bgScale","u_bgNextScale"])e.uniform2f(this.location(a),1,1);for(let a of["u_bgOffset","u_bgNextOffset"])e.uniform2f(this.location(a),0,0)}resize(){let e=Math.min(window.devicePixelRatio||1,2),i=this.canvas.clientWidth||240,t=this.canvas.clientHeight||i*112/144;this.canvas.width=Math.round(i*e),this.canvas.height=Math.round(t*e),this.gl.viewport(0,0,this.canvas.width,this.canvas.height),this.gl.uniform2f(this.location("u_resolution"),144,t/i*144),this.float("u_top",Math.max(0,t/i*144-112))}reset(){this.spring.value=this.spring.velocity=this.fade=this.intro=this.time=this.level=this.drop=this.thinking=0,this.drop=0,this.thinking=0}render(e,{state:i,level:t,reducedMotion:a=!1,circle:s=!1,opacity:o=.14,bottomGlow:r=.8,entrance:l=!0,elapsed:h=e}){let c=i!=="idle",d=!a&&l;this.drop=Math.max(0,Math.min(1,this.drop+(c?1:-1)*h/(c?.95:.8))),this.spring.target=c||d&&this.drop>0?1:0,this.thinking=Math.max(0,Math.min(1,this.thinking+(i==="processing"?1:-1)*e/.95)),this.float("u_drop",a||!l?1:this.drop),this.float("u_circle",Number(s)),this.float("u_bodyOpacity",o),this.float("u_bottomGlow",r),this.float("u_thinking",a?+(i==="processing"):this.thinking);let u=a?Number(c):this.spring.update(e);return this.level+=(t-this.level)*(1-Math.exp(-e*(t>this.level?18:7))),c&&u>.98?(this.fade=Math.min(1,this.fade+e/.3),this.intro=Math.min(1,this.intro+e/.65)):c||(this.fade=Math.max(0,this.fade-e/.16)),this.time-=e*(i==="processing"?1.2:2.7+this.level*1.6),this.float("u_progress",Math.max(0,Math.min(1.07,u))),this.float("u_waveFade",a?Number(c):this.fade),this.float("u_waveIntro",a?1:this.intro),this.float("u_time",a?-1.8:this.time),this.float("yScale",a?.11:i==="processing"?.065:.085+this.level*.13),this.float("glowIntensity",1.15+(a?0:this.level*.25)),this.gl.drawArrays(this.gl.TRIANGLES,0,6),d?c||this.drop>0:c||u>.002||Math.abs(this.spring.velocity)>.002}dispose(){let e=this.gl;this.canvas.removeEventListener("webglcontextlost",this.contextLost);for(let i of this.shaders)e.deleteShader(i);this.buffer&&e.deleteBuffer(this.buffer),this.texture&&e.deleteTexture(this.texture),this.program&&e.deleteProgram(this.program),e.getExtension("WEBGL_lose_context")?.loseContext()}};var m=class{constructor(e){this.host=e;let i=`siri-glass-${Math.random().toString(36).slice(2)}`,t=document.createElement("canvas");t.width=t.height=128;let a=t.getContext("2d");if(!a)return;let s=a.createImageData(128,128);for(let r=0;r<128;r++)for(let l=0;l<128;l++){let h=(l+.5)/64-1,c=(r+.5)/64-1,d=Math.hypot(h,c),u=d<1?Math.pow(d,3)*Math.sqrt(1-d)*4:0,k=(r*128+l)*4;s.data.set([128-h/Math.max(d,.001)*u*127,128-c/Math.max(d,.001)*u*127,128,255],k)}a.putImageData(s,0,0);let o="http://www.w3.org/2000/svg";this.svg=document.createElementNS(o,"svg"),this.svg.setAttribute("width","0"),this.svg.setAttribute("height","0"),this.svg.setAttribute("aria-hidden","true"),this.svg.style.position="absolute",this.svg.innerHTML=`<defs><filter id="${i}" x="0%" y="0%" width="100%" height="100%" color-interpolation-filters="sRGB"><feImage width="100%" height="100%" preserveAspectRatio="none" result="lens"/><feDisplacementMap in="SourceGraphic" in2="lens" xChannelSelector="R" yChannelSelector="G" scale="18"/></filter></defs>`,this.svg.querySelector("feImage").setAttribute("href",t.toDataURL()),this.displace=this.svg.querySelector("feDisplacementMap"),this.el=document.createElement("div"),this.el.className="siri-island-refraction",this.el.setAttribute("aria-hidden","true"),this.el.style.backdropFilter=`url(#${i})`,this.el.style.webkitBackdropFilter=`url(#${i})`,e.prepend(this.svg,this.el)}update(e,i){this.el&&(this.amount!==e&&(this.displace.setAttribute("scale",String(e)),this.amount=e),this.el.style.visibility=i&&e>0?"visible":"hidden")}};var v=Symbol.for("voice-satellite.siri-island"),D={idle:"",connecting:"Connecting",listening:"Listening",processing:"Thinking",speaking:"Speaking",error:"Check Voice Satellite"},g=class{constructor(e,i){this.ui=e,this.bar=i,this.state="idle",this.raf=0,this.lastTime=0,this.lastDraw=0,this.el=document.createElement("div"),this.el.className="siri-island",this.el.dataset.visible="false",this.el.innerHTML='<canvas aria-hidden="true"></canvas><div class="siri-island-fallback" aria-hidden="true"><i></i><i></i><i></i><i></i></div><span class="siri-island-label" role="status" aria-live="polite"></span>',this.glass=new m(this.el),this.canvas=this.el.querySelector("canvas"),this.label=this.el.querySelector(".siri-island-label"),e.append(this.el),e.classList.add("siri-island-enabled"),this.motion=matchMedia("(prefers-reduced-motion: reduce)"),this.change=()=>this.sync(),this.motion.addEventListener("change",this.change),document.addEventListener("visibilitychange",this.change),this.observer=new MutationObserver(this.change),this.observer.observe(i,{attributes:!0,attributeFilter:["class"]}),this.resizeObserver=new ResizeObserver(()=>{this.renderer?.resize(),this.state!=="idle"&&this.start()}),this.resizeObserver.observe(this.canvas),this.sync()}initRenderer(){if(!(this.renderer||this.failed))try{this.renderer=new p(this.canvas,()=>this.fallback()),this.el.dataset.renderer="webgl"}catch(e){console.warn("[Siri Island] Using static fallback:",e.message),this.fallback()}}fallback(){this.failed=!0,this.stop(),this.el.dataset.renderer="fallback",this.glass.update(0,!1)}sync(){let e=getComputedStyle(this.ui),i=(s,o,r=1)=>{let l=parseFloat(e.getPropertyValue(s));return Number.isFinite(l)?Math.max(0,Math.min(l,r)):o};this.appearance={circle:e.getPropertyValue("--siri-island-shape").trim()!=="island",opacity:i("--siri-island-glass-opacity",.14),bottomGlow:i("--siri-island-bottom-glow",.8,2),entrance:e.getPropertyValue("--siri-island-entrance").trim()!=="none"},this.refraction=i("--siri-island-refraction",18,40),this.el.dataset.shape=this.appearance.circle?"circle":"island";let t=_(this.bar),a=this.state==="idle";if(this.state=t,this.el.dataset.state=t,this.label.textContent=D[t],document.hidden){this.stop(),this.el.dataset.visible="false",this.glass.update(0,!1);return}t!=="idle"?(this.initRenderer(),a&&this.el.dataset.visible!=="true"&&this.renderer?.reset(),this.el.dataset.visible="true",this.start()):this.motion.matches||this.failed?(this.stop(),this.el.dataset.visible="false"):this.renderer&&this.start()}start(){this.raf||this.failed||!this.renderer||document.hidden||(this.lastTime=this.lastDraw=0,this.raf=requestAnimationFrame(e=>this.tick(e)))}tick(e){if(this.raf=0,document.hidden||this.failed)return;if(this.lastDraw&&e-this.lastDraw<30){this.raf=requestAnimationFrame(s=>this.tick(s));return}let i=this.lastTime?(e-this.lastTime)/1e3:1/30,t=Math.min(i,.05);this.lastDraw=this.lastTime=e;let a=this.renderer.render(t,{...this.appearance,elapsed:i,state:this.state,level:y(this.bar,this.state),reducedMotion:this.motion.matches});this.glass.update(this.refraction,this.state!=="idle"&&(this.motion.matches||!this.appearance.entrance||this.renderer.drop>=1)),a?this.motion.matches||(this.raf=requestAnimationFrame(s=>this.tick(s))):this.el.dataset.visible="false"}stop(){cancelAnimationFrame(this.raf),this.raf=0}dispose(){this.stop(),this.observer.disconnect(),this.resizeObserver.disconnect(),this.motion.removeEventListener("change",this.change),document.removeEventListener("visibilitychange",this.change),this.renderer?.dispose(),this.ui.classList.remove("siri-island-enabled"),this.el.remove()}};function b(){if(window[v])return window[v];let n=document.createElement("style");n.id="siri-island-styles",n.textContent=x,document.head.append(n);let e=null,i=!1,t=!1,a=()=>{if(i=!1,t)return;let h=document.getElementById("voice-satellite-ui"),c=h?.querySelector(".vs-rainbow-bar"),d=h&&getComputedStyle(h).getPropertyValue("--siri-island-enabled").trim()==="1";e&&(!d||e.ui!==h||e.bar!==c)&&(e.dispose(),e=null),d&&c&&!e?e=new g(h,c):e?.sync()},s=()=>{i||(i=!0,queueMicrotask(a))},o=new MutationObserver(s);o.observe(document.body,{childList:!0});let r=new MutationObserver(s);r.observe(document.head,{childList:!0,subtree:!0,characterData:!0});let l={version:"0.2.0",refresh:a,dispose(){t=!0,o.disconnect(),r.disconnect(),e?.dispose(),n.remove(),delete window[v]}};return window[v]=l,a(),l}document.body?b():document.addEventListener("DOMContentLoaded",b,{once:!0});

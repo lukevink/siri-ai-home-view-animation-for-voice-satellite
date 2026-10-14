@@ -73,6 +73,10 @@ output { width: 32px; }
 #voice-satellite-ui { font-family: system-ui, sans-serif; }
 #voice-satellite-ui .vs-chat-container { bottom: 238px; }
 #voice-satellite-ui.reactive-mode .vs-chat-container { bottom: 238px; }
+body #voice-satellite-ui.siri-island-enabled .vs-chat-container:not(.announcement-mode) {
+  bottom: 288px !important;
+  max-height: max(120px, calc(100vh - 560px));
+}
 #voice-satellite-ui .vs-chat-msg.user { font-size: 20px; }
 #voice-satellite-ui .vs-chat-msg.assistant { font-size: 25px; }
 :focus-visible { outline: 2px solid #b6a8ef; outline-offset: 3px; }

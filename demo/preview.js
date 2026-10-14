@@ -1,4 +1,8 @@
 let timers = [];
+document.body.classList.toggle('readme-preview', new URLSearchParams(location.search).has('readme'));
+if (document.body.classList.contains('readme-preview')) {
+  document.querySelector('.glass-test-pattern').innerHTML = 'LIGHTS · MUSIC · CLIMATE<br>Your home, at a word.';
+}
 let audioTimer;
 let activeState = 'idle';
 const levelInput = document.getElementById('level');

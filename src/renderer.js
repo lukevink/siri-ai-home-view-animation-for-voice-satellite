@@ -69,7 +69,7 @@ export class IslandRenderer {
       gl.uniform2f(this.location('u_resolution'), 144, 112);
       gl.uniform4f(this.location('u_shapeParams'), 53, 41, 0.01, 0);
       gl.uniform3f(this.location('u_glassTint'), 0.94, 0.96, 1);
-      gl.uniform1i(this.location('activeWaves'), 4);
+      gl.uniform1i(this.location('activeWaves'), 6);
       gl.uniform3fv(this.location('uColors[0]'), COLORS.flatMap(hex => {
         const n = parseInt(hex, 16);
         return [(n >> 16 & 255) / 255, (n >> 8 & 255) / 255, (n & 255) / 255];
@@ -140,7 +140,8 @@ export class IslandRenderer {
     // Keep the orb full-sized while it rises. Collapse only after it has
     // merged into the bezel, rather than shrinking to a pill in mid-air.
     this.spring.target = active || (liquidMotion && this.drop > 0) ? 1 : 0;
-    this.thinking += (Number(state === 'processing') - this.thinking) * (1 - Math.exp(-delta * 8));
+    this.thinking = Math.max(0, Math.min(1,
+      this.thinking + (state === 'processing' ? 1 : -1) * delta / 0.95));
     this.float('u_drop', reducedMotion || !entrance ? 1 : this.drop);
     this.float('u_circle', Number(circle));
     this.float('u_bodyOpacity', opacity);
