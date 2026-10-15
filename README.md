@@ -60,7 +60,7 @@ Merge this into an existing `frontend:` section rather than creating a duplicate
 ## Manual installation
 
 1. Copy [`dist/siri-island.js`](dist/siri-island.js) to `/config/www/siri-island.js` on your Home Assistant server.
-2. Add `/local/siri-island.js?v=0.2.4` as a JavaScript module under Dashboard Resources, or use that URL under `frontend.extra_module_url` above.
+2. Add `/local/siri-island.js?v=0.2.18` as a JavaScript module under Dashboard Resources, or use that URL under `frontend.extra_module_url` above.
 3. Follow steps 5–7 from the HACS instructions.
 
 No Python component, card YAML, or access token is required. Keep the copyright/license banner in the distributed JavaScript file intact.

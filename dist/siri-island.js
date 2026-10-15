@@ -1,4 +1,4 @@
-/*! Siri AI Home View Animation for Voice Satellite 0.2.17 — AGPL-3.0-only.
+/*! Siri AI Home View Animation for Voice Satellite 0.2.18 — AGPL-3.0-only.
  * Source: https://github.com/lukevink/siri-homeview-hass-animation
  * Shader adapted from neeldedkawala/ios-siri-animation (MIT).
 MIT License

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.18
+
+- Refresh both README animations with the current glass refraction and motion.
+- Update the manual-installation resource version.
+
 ## 0.2.17
 
 - Adapt the original animation’s Snell-law edge optics to the live backdrop, preserving central text with stronger bending confined to the rim.
