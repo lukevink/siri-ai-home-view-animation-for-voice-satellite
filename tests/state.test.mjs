@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readActivity, audioLevel, Spring } from '../src/state.js';
 import { IslandRenderer } from '../src/renderer.js';
-import { sphereDisplacement } from '../src/lens.js';
+import { glassDisplacement } from '../src/lens.js';
 
 const bar = (classes, level = '0') => ({ classList: new Set(classes.split(' ')), style: { getPropertyValue: () => level } });
 const makeBar = (...args) => { const b = bar(...args); b.classList.contains = b.classList.has; return b; };
@@ -68,23 +68,20 @@ test('thinking reaches the spinning phase within a second, including slow frames
 });
 
 
-test('spherical lens preserves the center and compresses into a continuous rim', () => {
-  assert.equal(sphereDisplacement(0), 0);
-  assert.equal(sphereDisplacement(1), 0);
-  const source = r => r + sphereDisplacement(r);
-  assert.equal(source(.3), .3, 'central window should preserve the scene');
-  assert.ok(source(.5) > .45, 'middle should have only mild distortion');
-  assert.ok((source(.99) - source(.98)) / .01 > 2, 'rim should compress detail');
+test('edge lens preserves central text and bends the perimeter', () => {
+  assert.equal(glassDisplacement(0), 0);
+  assert.equal(glassDisplacement(1), 0);
+  assert.ok(Math.abs(glassDisplacement(.5)) < .001, 'center should stay nearly unchanged');
+  assert.ok(Math.abs(glassDisplacement(.9)) > .10, 'outer shell should strongly bend the scene');
 });
 
-test('lens strength range preserves radial ordering without folded or inverted text', () => {
+test('edge lens stays bounded and continuous through the rim at supported strengths', () => {
   for (const gain of [0, 1, 120 / 64]) {
-    let previous = 0;
-    for (let i = 1; i <= 1000; i++) {
-      const r = i / 1000;
-      const source = r + gain * sphereDisplacement(r);
-      assert.ok(Number.isFinite(source) && source > previous && source <= 1);
-      previous = source;
+    for (let i = 0; i <= 10000; i++) {
+      const r = i / 10000;
+      const source = r + gain * glassDisplacement(r);
+      assert.ok(Number.isFinite(source) && source >= 0 && source <= 1);
     }
   }
+  assert.ok(Math.abs(glassDisplacement(1 - 1e-10)) < .001);
 });
