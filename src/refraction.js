@@ -1,6 +1,6 @@
-import { sphereDisplacement } from './lens.js';
+import { glassDisplacement } from './lens.js';
 
-const MAP_RANGE = 0.17; // Use most of the 8-bit channel range to avoid visible steps.
+const MAP_RANGE = 0.31; // Use most of the 8-bit channel range to avoid visible steps.
 
 /** Live backdrop refraction, progressively enhanced through an inline SVG filter.
  * No DOM capture or remote textures: the browser composites the actual backdrop.
@@ -42,7 +42,7 @@ export class GlassRefraction {
     for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) {
       const nx = (x + .5) / (size / 2) - 1, ny = (y + .5) / (size / 2) - 1;
       const r = Math.hypot(nx, ny);
-      const bend = r > 0 && r < 1 ? sphereDisplacement(r) / r : 0;
+      const bend = r > 0 && r < 1 ? glassDisplacement(r) / r : 0;
       // SVG displacement samples source at destination + scale * (channel - .5).
       // Encode each axis in its own radius so resizing and island aspect ratios
       // retain the same optical curvature rather than a fixed pixel shift.

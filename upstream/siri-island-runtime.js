@@ -634,18 +634,21 @@ var IslandRenderer = class {
 };
 
 // src/lens.js
-function sphereDisplacement(radius) {
+function glassDisplacement(radius) {
   const r = Math.max(0, Math.min(1, radius));
   if (r === 0 || r === 1) return 0;
-  const depth = Math.sqrt(Math.max(0, 1 - r * r));
-  const deflection = Math.asin(r) - Math.asin(r / 1.45);
-  const edge = Math.max(0, Math.min(1, (r - 0.3) / 0.5));
-  const shell = edge * edge * (3 - 2 * edge);
-  return -0.75 * shell * depth * Math.tan(deflection);
+  const distance = (1 - r) * 43;
+  const u = distance / 58;
+  const arc = Math.max(0, 1 - (1 - u) ** 16);
+  const height = 31 * Math.sqrt(arc);
+  const slope = 31 / 58 * (1 - u) ** 15 / Math.max(Math.sqrt(arc), 0.05);
+  const incidence = Math.atan(slope);
+  const transmission = Math.asin(Math.sin(incidence) / 3.05);
+  return -height * Math.tan(incidence - transmission) * 1.5 / 43;
 }
 
 // src/refraction.js
-var MAP_RANGE = 0.17;
+var MAP_RANGE = 0.31;
 var GlassRefraction = class {
   constructor(host) {
     this.host = host;
@@ -684,7 +687,7 @@ var GlassRefraction = class {
     for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) {
       const nx = (x + 0.5) / (size / 2) - 1, ny = (y + 0.5) / (size / 2) - 1;
       const r = Math.hypot(nx, ny);
-      const bend = r > 0 && r < 1 ? sphereDisplacement(r) / r : 0;
+      const bend = r > 0 && r < 1 ? glassDisplacement(r) / r : 0;
       pixels.data.set([
         Math.round(255 * (0.5 + nx * bend * width / this.diameter / (2 * MAP_RANGE))),
         Math.round(255 * (0.5 + ny * bend * height / this.diameter / (2 * MAP_RANGE))),

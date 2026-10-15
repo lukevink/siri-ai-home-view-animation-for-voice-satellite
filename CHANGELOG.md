@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.17
+
+- Adapt the original animation’s Snell-law edge optics to the live backdrop, preserving central text with stronger bending confined to the rim.
+
 ## 0.2.16
 
 - Use spherical lens refraction to preserve the center and bend detail into the rim.

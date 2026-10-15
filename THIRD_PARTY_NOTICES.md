@@ -10,7 +10,7 @@ Reference revision: `801ac85bc87f1446c25e85ad6258a7af43663797`.
 
 License: MIT. Full notice: [licenses/ios-siri-animation.txt](licenses/ios-siri-animation.txt).
 
-`src/shader.js` adapts the fragment shader from `js/main.js`. `src/state.js` adapts the spring model. `src/renderer.js` retains reference visual parameters and supplies a WebGL renderer, procedural environment texture, cropped viewport, and audio-level modulation. Shader changes include portable smoothstep falloffs and a guard against division by zero at wave tips. The original Three.js demo, phone shell, wallpaper images, and control dock are not shipped.
+`src/shader.js` adapts the fragment shader from `js/main.js`. `src/lens.js` adapts its Snell-law edge profile for the live backdrop displacement map, with adjusted curvature and strength. `src/state.js` adapts the spring model. `src/renderer.js` retains reference visual parameters and supplies a WebGL renderer, procedural environment texture, cropped viewport, and audio-level modulation. Shader changes include portable smoothstep falloffs and a guard against division by zero at wave tips. The original Three.js demo, phone shell, wallpaper images, and control dock are not shipped.
 
 The original MIT notice is embedded in `dist/siri-island.js` and `upstream/siri-island-runtime.js`.
 
